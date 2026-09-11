@@ -1,0 +1,29 @@
+﻿Form: ADRASEC06_Message_Initial.html, ADRASEC06_Message_Viewer.html
+SeqInc:
+To: <var vTo>
+Subject: [<var Priority>][<var vType>/<var vNumero>] <var vSujet>
+Msg:
+------------------------------------------------------------------------
+-- <var vTypeLib>
+------------------------------------------------------------------------
+
+Message N°: <var vNumero>
+Priorité: <var Priority>
+Demande AR: <var Dem_Rep>
+
+Date: <var vDate>
+Heure: <var vHeure>
+Indicatif de la station: <var msgSender>
+
+------------------------------------------------------------------------
+
+Origine: <var vOrigine>
+Destinataire(s): <var vTo>
+
+------------------------------------------------------------------------
+
+<var vCorps>
+------------------------------------------------------------------------
+Express Sending Station: <MsgSender>
+Express Version: <ProgramVersion>
+Template Version: <var TemplateVersion>
