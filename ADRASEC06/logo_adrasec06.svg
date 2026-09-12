@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 320 320" width="320" height="320" role="img" aria-label="Logo ADRASEC 06 - Securite Civile">
+  <title>A.D.R.A.S.E.C 06 - Securite Civile</title>
+
+  <defs>
+    <radialGradient id="orange" cx="42%" cy="34%" r="78%">
+      <stop offset="0%" stop-color="#FFB347"/>
+      <stop offset="55%" stop-color="#F58215"/>
+      <stop offset="100%" stop-color="#D95E00"/>
+    </radialGradient>
+
+    <linearGradient id="bleu" x1="20%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#3F5CFF"/>
+      <stop offset="55%" stop-color="#1B2FE0"/>
+      <stop offset="100%" stop-color="#0A159E"/>
+    </linearGradient>
+
+    <path id="arcHaut" d="M 51.0,199.7 A 116,116 0 1,1 269.0,199.7" fill="none"/>
+    <path id="arcBas"  d="M 19.1,211.3 A 150,150 0 0,0 300.9,211.3" fill="none"/>
+  </defs>
+
+  <!-- Anneau exterieur -->
+  <circle cx="160" cy="160" r="156" fill="none" stroke="#0A159E" stroke-width="4"/>
+
+  <!-- Disque orange -->
+  <circle cx="160" cy="160" r="108" fill="url(#orange)"/>
+  <circle cx="160" cy="160" r="108" fill="none" stroke="#0A159E" stroke-width="3"/>
+
+  <!-- Triangle de la protection civile -->
+  <polygon points="160,52 253.5,214 66.5,214" fill="url(#bleu)" stroke="#08117F" stroke-width="3"
+    stroke-linejoin="round"/>
+
+  <!-- Textes circulaires -->
+  <g font-family="'Arial Black','Arial Bold',Arial,Helvetica,sans-serif" font-weight="bold" fill="#0F1FBE">
+    <text font-size="27" letter-spacing="1">
+      <textPath href="#arcHaut" xlink:href="#arcHaut" startOffset="50%" text-anchor="middle">A.D.R.A.S.E.C 06</textPath>
+    </text>
+    <text font-size="26" letter-spacing="1.5">
+      <textPath href="#arcBas" xlink:href="#arcBas" startOffset="50%" text-anchor="middle">SECURITE CIVILE</textPath>
+    </text>
+  </g>
+</svg>

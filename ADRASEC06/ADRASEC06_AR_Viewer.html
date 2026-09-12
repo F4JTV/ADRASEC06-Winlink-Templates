@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<!--
+--------------------------------------------------------------------------
+-- Modele Winlink ADRASEC 06 - Visualiseur
+-- Message d'ambiance / Message de situation / Message encapsule
+-- Gabarit visuel inspire des modeles FNRASEC (F4IXH - MIT)
+--------------------------------------------------------------------------
+-->
+
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="version" content="1.0.0">
+  <title>Accuse de reception ADRASEC 06</title>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 10px;
+      padding: 0px;
+      display: flex;
+      justify-content: left;
+      align-items: top;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    hr { border: none; border-top: 1px dotted #333; }
+    pre { margin: 0; }
+
+    .spacer { margin-top: 18px; margin-bottom: 18px; }
+
+    .container {
+      background-color: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 850px;
+    }
+
+    .main-content { padding: 0; min-height: 60vh; }
+
+    .grid-container { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .grid-container2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-container3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+    @media print {
+      @page { margin: 0; }
+      body { padding: 10px; }
+      .no-print, .no-print * { display: none !important; }
+      .container {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        width: 100%;
+        max-width: none;
+      }
+      #printPageButton { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .grid-container, .grid-container2, .grid-container3 { grid-template-columns: 1fr; }
+    }
+
+    .header {
+      text-align: left;
+      margin-bottom: 1.3rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+    }
+
+    .header div.left { text-align: left; }
+    .header div.center { text-align: center; }
+    .header img { max-height: 110px; width: auto; }
+
+    .header h1 {
+      font-size: 1.5em;
+      margin: 0.5em;
+      margin-bottom: 0.8rem;
+      text-align: center;
+    }
+
+    /* Logos vectoriels du bandeau */
+    .header svg.logo {
+      height: 110px;
+      width: auto;
+      display: inline-block;
+    }
+
+    @media (max-width: 600px) {
+      .header svg.logo { height: 72px; }
+    }
+
+    .form-group { margin-bottom: 0.5rem; margin-top: 0.5rem; }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      color: #333;
+      font-size: 0.875rem;
+    }
+
+    .button { display: flex; justify-content: center; margin: 20px; }
+
+    .form-group button {
+      padding: 0.5rem 1rem;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .form-group button:hover { background-color: #0056b3; }
+
+    .section-title {
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: #004085;
+      border-left: 4px solid #007bff;
+      padding-left: 8px;
+      margin-top: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .type-banner {
+      display: inline-block;
+      font-weight: bold;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      color: #fff;
+      background-color: #007bff;
+      border-radius: 4px;
+      padding: 6px 14px;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer {
+      width: 100%;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      text-align: center;
+      font-style: italic;
+      margin-top: 0.5rem;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    .adrasec-text {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    .code-block {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      width: 100%;
+      box-sizing: border-box;
+      display: block;
+    }
+
+    .prio-IMMEDIAT { color: red; font-weight: bold; }
+    .prio-URGENT { color: orange; font-weight: bold; }
+    .prio-ROUTINE { color: green; font-weight: bold; }
+  </style>
+
+  <script type="text/javascript">
+    function setacc(s) {
+      let c = s;
+      c = c.replace(/\u00C3\u00A2/g, "\u00E2");
+      c = c.replace(/\u00C3\u00A9/g, "\u00E9");
+      c = c.replace(/\u00C3\u00A8/g, "\u00E8");
+      c = c.replace(/\u00C3\u00AA/g, "\u00EA");
+      c = c.replace(/\u00C3\u00AB/g, "\u00EB");
+      c = c.replace(/\u00C3\u00AE/g, "\u00EE");
+      c = c.replace(/\u00C3\u00AF/g, "\u00EF");
+      c = c.replace(/\u00C3\u00B4/g, "\u00F4");
+      c = c.replace(/\u00C3\u00B9/g, "\u00F9");
+      c = c.replace(/\u00C3\u00BB/g, "\u00FB");
+      c = c.replace(/\u00C3\u00A7/g, "\u00E7");
+      c = c.replace(/\u00C2\u00B0/g, "\u00B0");
+      c = c.replace(/\u00E2\u20AC\u2122/g, "'");
+      return c;
+    }
+
+    function init() {
+      var ids = ["vOrigine", "vTo", "vRef", "vCommentaire"];
+      for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (el) el.innerHTML = setacc(el.innerHTML);
+      }
+
+      var prio = document.getElementById("Priority");
+      prio.className = "code-block prio-" + prio.innerHTML.trim();
+    }
+  </script>
+
+</head>
+
+<body onload="init()">
+  <div class="container">
+
+    <div class="header">
+      <div class="left">
+        <svg class="logo" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 320 320"
+          role="img" aria-label="Logo ADRASEC 06 - Securite Civile">
+          <title>A.D.R.A.S.E.C 06 - Securite Civile</title>
+          <defs>
+            <radialGradient id="adrOrange" cx="42%" cy="34%" r="78%">
+              <stop offset="0%" stop-color="#FFB347" />
+              <stop offset="55%" stop-color="#F58215" />
+              <stop offset="100%" stop-color="#D95E00" />
+            </radialGradient>
+            <linearGradient id="adrBleu" x1="20%" y1="0%" x2="85%" y2="100%">
+              <stop offset="0%" stop-color="#3F5CFF" />
+              <stop offset="55%" stop-color="#1B2FE0" />
+              <stop offset="100%" stop-color="#0A159E" />
+            </linearGradient>
+            <path id="adrArcHaut" d="M 51.0,199.7 A 116,116 0 1,1 269.0,199.7" fill="none" />
+            <path id="adrArcBas" d="M 19.1,211.3 A 150,150 0 0,0 300.9,211.3" fill="none" />
+          </defs>
+          <circle cx="160" cy="160" r="156" fill="none" stroke="#0A159E" stroke-width="4" />
+          <circle cx="160" cy="160" r="108" fill="url(#adrOrange)" />
+          <circle cx="160" cy="160" r="108" fill="none" stroke="#0A159E" stroke-width="3" />
+          <polygon points="160,52 253.5,214 66.5,214" fill="url(#adrBleu)" stroke="#08117F" stroke-width="3"
+            stroke-linejoin="round" />
+          <g font-family="'Arial Black','Arial Bold',Arial,Helvetica,sans-serif" font-weight="bold" fill="#0F1FBE">
+            <text font-size="27" letter-spacing="1">
+              <textPath href="#adrArcHaut" xlink:href="#adrArcHaut" startOffset="50%"
+                text-anchor="middle">A.D.R.A.S.E.C 06</textPath>
+            </text>
+            <text font-size="26" letter-spacing="1.5">
+              <textPath href="#adrArcBas" xlink:href="#adrArcBas" startOffset="50%"
+                text-anchor="middle">SECURITE CIVILE</textPath>
+            </text>
+          </g>
+        </svg>
+      </div>
+      <div class="center">
+        <h1>Accuse de reception</h1>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <section id="main">
+
+        <div class="grid-container">
+          <div class="form-group">
+            <span class="type-banner">ACCUSE DE RECEPTION</span>
+          </div>
+        </div>
+
+        <div class="grid-container3">
+          <div class="form-group">
+            <label>N&deg; de l'AR</label>
+            <span id="vNumero" class="code-block">AR/{var vNumero}</span>
+          </div>
+
+          <div class="form-group">
+            <label>Priorite</label>
+            <span id="Priority" class="code-block">{var Priority}</span>
+          </div>
+
+          <div class="form-group">
+            <label>Station emettrice</label>
+            <span id="msgSender" class="code-block">{var msgSender}</span>
+          </div>
+        </div>
+
+        <div class="grid-container3">
+          <div class="form-group">
+            <label>Date</label>
+            <span id="vDate" class="code-block">{var vDate}</span>
+          </div>
+
+          <div class="form-group">
+            <label>Heure</label>
+            <span id="vHeure" class="code-block">{var vHeure}</span>
+          </div>
+
+          <div class="form-group"></div>
+        </div>
+
+        <hr>
+
+        <div class="grid-container2">
+          <div class="form-group">
+            <label>Origine</label>
+            <span id="vOrigine" class="code-block">{var vOrigine}</span>
+          </div>
+
+          <div class="form-group">
+            <label>Destinataire</label>
+            <span id="vTo" class="code-block">{var vTo}</span>
+          </div>
+        </div>
+
+        <div class="grid-container">
+          <div class="form-group">
+            <label>Reference du message accuse</label>
+            <span id="vRef" class="code-block">{var vRef}</span>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="grid-container">
+          <div class="form-group">
+            <label>Commentaire</label>
+            <pre id="vCommentaire" class="code-block">{var vCommentaire}</pre>
+          </div>
+        </div>
+
+        <div class="form-group button no-print">
+          <button id="printPageButton" onclick="javascript:window.print()">Imprimer</button>
+        </div>
+
+      </section>
+    </div>
+
+    <div class="footer no-print">
+      <span id="version" class="footer-text">ADRASEC 06 - AR v1.0.0</span>
+      <span id="brand" class="adrasec-text">ADRASEC 06</span>
+      <span id="projectLink" class="footer-text">Winlink Template</span>
+    </div>
+
+  </div>
+
+</body>
+
+</html>

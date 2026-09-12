@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Modele Winlink ADRASEC 06">
   <meta name="version" content="1.0.0">
-  <title>Message ADRASEC 06</title>
+  <title>Accuse de reception ADRASEC 06</title>
 
   <style>
     body {
@@ -277,7 +277,6 @@
     // Fonctions communes (adaptees de CommonFunctions.js - FNRASEC)
     //==================================================================
 
-    // Agrandissement automatique des zones de saisie
     function AutoGrowTextArea(textField) {
       if (textField.clientHeight < textField.scrollHeight) {
         textField.style.height = textField.scrollHeight + "px";
@@ -287,15 +286,33 @@
       }
     }
 
-    // Suppression des accents sur les majuscules (transmission Winlink)
     function removeUppercaseAccent(text) {
-      let t = text.replace(/[ÀÁÂÃÄÅ]/g, "A");
-      t = t.replace(/[ÈÉÊË]/g, "E");
-      t = t.replace(/[ÌÍÎÏ]/g, "I");
-      t = t.replace(/[ÒÓÔÕÖ]/g, "O");
-      t = t.replace(/[ÙÚÛÜ]/g, "U");
-      t = t.replace(/[Ç]/g, "C");
+      let t = text.replace(/[\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5]/g, "A");
+      t = t.replace(/[\u00C8\u00C9\u00CA\u00CB]/g, "E");
+      t = t.replace(/[\u00CC\u00CD\u00CE\u00CF]/g, "I");
+      t = t.replace(/[\u00D2\u00D3\u00D4\u00D5\u00D6]/g, "O");
+      t = t.replace(/[\u00D9\u00DA\u00DB\u00DC]/g, "U");
+      t = t.replace(/[\u00C7]/g, "C");
       return t;
+    }
+
+    // Restauration des accents mal encodes dans les valeurs heritees du message recu
+    function setacc(s) {
+      let c = s;
+      c = c.replace(/\u00C3\u00A2/g, "\u00E2");
+      c = c.replace(/\u00C3\u00A9/g, "\u00E9");
+      c = c.replace(/\u00C3\u00A8/g, "\u00E8");
+      c = c.replace(/\u00C3\u00AA/g, "\u00EA");
+      c = c.replace(/\u00C3\u00AB/g, "\u00EB");
+      c = c.replace(/\u00C3\u00AE/g, "\u00EE");
+      c = c.replace(/\u00C3\u00AF/g, "\u00EF");
+      c = c.replace(/\u00C3\u00B4/g, "\u00F4");
+      c = c.replace(/\u00C3\u00B9/g, "\u00F9");
+      c = c.replace(/\u00C3\u00BB/g, "\u00FB");
+      c = c.replace(/\u00C3\u00A7/g, "\u00E7");
+      c = c.replace(/\u00C2\u00B0/g, "\u00B0");
+      c = c.replace(/\u00E2\u20AC\u2122/g, "'");
+      return c;
     }
 
     // Bascule UTC / Locale sur les champs Date et Heure
@@ -325,47 +342,6 @@
     }
 
     //==================================================================
-    // Gestion du type de message
-    //==================================================================
-    function getTypeMessage() {
-      var radios = document.getElementsByName("vType");
-      for (var i = 0; i < radios.length; i++) {
-        if (radios[i].checked) return radios[i].value;
-      }
-      return "";
-    }
-
-    function setFormType() {
-      var type = getTypeMessage();
-      var encapsule = (type === "ENCAPSULE");
-
-      document.getElementById("blocAutorites").style.display = encapsule ? "" : "none";
-      document.getElementById("blocEncapsule").style.display = encapsule ? "" : "none";
-      document.getElementById("blocSOIE").style.display = encapsule ? "none" : "";
-
-      // Champs obligatoires selon le type
-      document.getElementById("vAutOrig").required = encapsule;
-      document.getElementById("vAutDest").required = encapsule;
-      document.getElementById("vSujet").required = encapsule;
-      document.getElementById("vMessage").required = encapsule;
-
-      document.getElementById("vJeSuis").required = !encapsule;
-      document.getElementById("vJeVois").required = !encapsule;
-      document.getElementById("vJeFais").required = !encapsule;
-      document.getElementById("vJeDemande").required = false;
-
-      // Titre du bloc SOIE
-      document.getElementById("titreSOIE").innerHTML =
-        (type === "AMBIANCE") ? "Message d'ambiance" : "Message de situation";
-    }
-
-    function libelleType(type) {
-      if (type === "AMBIANCE") return "MESSAGE D'AMBIANCE";
-      if (type === "SITUATION") return "MESSAGE DE SITUATION";
-      return "MESSAGE ENCAPSULE";
-    }
-
-    //==================================================================
     // Initialisation
     //==================================================================
     function init() {
@@ -378,73 +354,28 @@
       });
 
       SetDateToUTC();
-      setFormType();
+
+      // Numero de l'AR : identifiant du message accuse, sinon numero de sequence
+      var numero = '{MsgOriginalID}';
+      if (!numero || numero.indexOf('{') === 0) numero = '{SeqNum}';
+      document.getElementById("vNumero").value = numero;
+
+      // La reference heritee du message recu peut contenir des accents mal encodes
+      var ref = document.getElementById("vRef");
+      ref.value = setacc(ref.value);
+      AutoGrowTextArea(ref);
     }
 
     //==================================================================
-    // Construction du corps du message et envoi
+    // Envoi
     //==================================================================
-    function bloc(titre, texte) {
-      var ligne = "------------------------------------------------------------------------";
-      return "-- " + titre + "\n" + ligne + "\n" + (texte ? texte : "(neant)") + "\n\n";
-    }
-
     function onSubmit() {
-      var type = getTypeMessage();
-      var encapsule = (type === "ENCAPSULE");
-
-      // Nettoyage des accents majuscules
-      var champs = ["vOrigine", "vTo", "vAutOrig", "vAutDest", "vSujet",
-                    "vMessage", "vJeSuis", "vJeVois", "vJeFais", "vJeDemande"];
+      var champs = ["vOrigine", "vTo", "vRef", "vCommentaire"];
       for (var i = 0; i < champs.length; i++) {
         var el = document.getElementById(champs[i]);
         el.value = removeUppercaseAccent(el.value);
       }
-
-      // Vide les champs non utilises pour ne pas polluer le message
-      if (encapsule) {
-        document.getElementById("vJeSuis").value = "";
-        document.getElementById("vJeVois").value = "";
-        document.getElementById("vJeFais").value = "";
-        document.getElementById("vJeDemande").value = "";
-      } else {
-        document.getElementById("vAutOrig").value = "";
-        document.getElementById("vAutDest").value = "";
-        document.getElementById("vMessage").value = "";
-      }
-
-      // Corps du message (texte transmis)
-      var corps = "";
-      if (encapsule) {
-        corps += "Autorite origine       : " + document.getElementById("vAutOrig").value + "\n";
-        corps += "Autorite destinataire  : " + document.getElementById("vAutDest").value + "\n\n";
-        corps += bloc("MESSAGE DE L'AUTORITE", document.getElementById("vMessage").value);
-      } else {
-        corps += bloc("JE SUIS", document.getElementById("vJeSuis").value);
-        corps += bloc("JE VOIS", document.getElementById("vJeVois").value);
-        corps += bloc("JE FAIS", document.getElementById("vJeFais").value);
-        corps += bloc("JE DEMANDE", document.getElementById("vJeDemande").value);
-      }
-      document.getElementById("vCorps").value = corps;
-
-      // Libelle du type et sujet de la messagerie
-      document.getElementById("vTypeLib").value = libelleType(type);
-
-      var sujet = encapsule
-        ? document.getElementById("vSujet").value
-        : libelleType(type) + " du " + document.getElementById("vDate").value
-          + " " + document.getElementById("vHeure").value;
-
-      document.getElementById("vSujet").value = removeUppercaseAccent(sujet);
-
-      var avis = 'Cliquez sur OK et fermez la fenetre de navigateur vide.';
-      if (document.getElementById("Dem_Rep").checked) {
-        avis = 'ACCUSE DE RECEPTION DEMANDE\n\n'
-             + 'Pensez a cocher "Request message receipt" dans la fenetre\n'
-             + 'de redaction Winlink avant d\'envoyer le message.\n\n'
-             + avis;
-      }
-      return confirm(avis);
+      return confirm('Cliquez sur OK et fermez la fenetre de navigateur vide.');
     }
   </script>
 
@@ -491,7 +422,7 @@
         </svg>
       </div>
       <div class="center">
-        <h1>Message ADRASEC 06
+        <h1>Accuse de reception
           <a href="#" id="help-link" title="Afficher l'aide en ligne">&#9432;</a>
         </h1>
       </div>
@@ -500,42 +431,21 @@
     <div class="main-content">
 
       <section id="main">
-        <form onsubmit="return onSubmit();" method="post" id="ADRASEC06Form" enctype="multipart/form-data"
+        <form onsubmit="return onSubmit();" method="post" id="ADRASEC06ARForm" enctype="multipart/form-data"
           action="http://{FormServer}:{FormPort}">
 
           <input name="TemplateVersion" type="hidden" id="TemplateVersion" value="1.0.0" />
           <input name="msgSender" type="hidden" id="msgSender" value="{Callsign}" />
-          <input name="vTypeLib" type="hidden" id="vTypeLib" value="" />
-          <textarea name="vCorps" id="vCorps" style="display:none;"></textarea>
 
-          <!-- Type de message -->
-          <div class="grid-container">
-            <div class="form-group">
-              <label>Type de message</label>
-              <div class="radio-group">
-                <div class="green">
-                  <input type="radio" name="vType" id="typeAmbiance" value="AMBIANCE" checked
-                    onclick="setFormType()">
-                  <span>Message d'ambiance</span>
-                </div>
-                <div class="orange">
-                  <input type="radio" name="vType" id="typeSituation" value="SITUATION" onclick="setFormType()">
-                  <span>Message de situation</span>
-                </div>
-                <div class="blue">
-                  <input type="radio" name="vType" id="typeEncapsule" value="ENCAPSULE" onclick="setFormType()">
-                  <span>Message encapsule</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- N° message / Priorite / Accuse de reception -->
+          <!-- N&deg; de l'AR / Priorite -->
           <div class="grid-container3">
             <div class="form-group">
-              <label for="vNumero">N&deg; du message</label>
-              <input title="Vous pouvez ecraser cette reference avec votre propre numerotation" name="vNumero"
-                id="vNumero" value="{SeqNum}" size="8" maxlength="10" style="color: red;" required>
+              <label for="vNumero">N&deg; de l'AR</label>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <span style="font-weight: bold; color: #004085;">AR /</span>
+                <input title="Reference du message accuse, modifiable" name="vNumero" id="vNumero" value="{SeqNum}"
+                  size="8" maxlength="20" style="color: red;" required>
+              </div>
             </div>
 
             <div class="form-group">
@@ -556,21 +466,14 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <div style="display: flex; align-items: center; height: 100%; padding-top: 10px;">
-                <input type="checkbox" name="Dem_Rep" id="Dem_Rep" value="Oui"
-                  onclick="this.value = this.checked ? 'Oui' : 'Non';"
-                  style="width: 20px; height: 20px; margin-right: 8px; margin-top: 0;">
-                <label for="Dem_Rep" style="margin: 0;">Demander un accuse de reception</label>
-              </div>
-            </div>
+            <div class="form-group"></div>
           </div>
 
           <!-- Date / Heure -->
           <div class="grid-container3">
             <div class="form-group">
               <label for="vDate">Date</label>
-              <input id="vDate" name="vDate" placeholder="AAAA-MM-JJ" title="Date du message" required />
+              <input id="vDate" name="vDate" placeholder="AAAA-MM-JJ" title="Date de l'accuse de reception" required />
             </div>
 
             <div class="form-group">
@@ -591,88 +494,33 @@
           <div class="grid-container2">
             <div class="form-group">
               <label for="vOrigine">Origine</label>
-              <input name="vOrigine" id="vOrigine" title="Indicatif de la station emettrice" value="{msgSender}"
-                placeholder="Indicatif de la station emettrice" size="20" maxlength="20" class="bg-yellow" required />
+              <input name="vOrigine" id="vOrigine" title="Indicatif de la station qui accuse reception"
+                value="{Callsign}" size="20" maxlength="20" class="bg-yellow" required />
             </div>
 
             <div class="form-group">
-              <label for="vTo">Destinataire(s)</label>
-              <input name="vTo" id="vTo" title="Indicatifs des destinataires"
-                placeholder="Separes par des ';'. Ex : F4JTV;F8KFG" size="100" maxlength="100" class="bg-yellow"
-                required />
+              <label for="vTo">Destinataire</label>
+              <input name="vTo" id="vTo" title="Indicatif de la station qui a emis le message accuse"
+                value="{MsgOriginalSender}" size="100" maxlength="100" class="bg-yellow" required />
             </div>
           </div>
 
-          <!-- ============ Bloc MESSAGE ENCAPSULE ============ -->
-          <div id="blocAutorites">
-            <div class="section-title">Message encapsule</div>
-            <div class="grid-container2">
-              <div class="form-group">
-                <label for="vAutOrig">Autorite d'origine</label>
-                <input name="vAutOrig" id="vAutOrig" title="Autorite d'origine"
-                  placeholder="Ex : Prefecture 06, COD, COZ-Sud..." size="80" maxlength="80" class="bg-green" />
-              </div>
-
-              <div class="form-group">
-                <label for="vAutDest">Autorite destinataire</label>
-                <input name="vAutDest" id="vAutDest" title="Autorite destinataire"
-                  placeholder="Ex : COGIC, COD, COZ..." size="80" maxlength="80" class="bg-green" />
-              </div>
+          <!-- Reference du message accuse -->
+          <div class="grid-container">
+            <div class="form-group">
+              <label for="vRef">Reference du message accuse</label>
+              <textarea name="vRef" id="vRef" title="Sujet du message recu, pre-rempli automatiquement" rows="1"
+                required onkeyup="AutoGrowTextArea(this)">{MsgOriginalSubject}</textarea>
             </div>
           </div>
 
-          <div id="blocEncapsule">
-            <div class="grid-container">
-              <div class="form-group">
-                <label for="vSujet">Sujet</label>
-                <textarea placeholder="Objet du message de l'autorite" name="vSujet" id="vSujet"
-                  title="Sujet du message" rows="1" onkeyup="AutoGrowTextArea(this)"></textarea>
-              </div>
-            </div>
-
-            <div class="grid-container">
-              <div class="form-group">
-                <label for="vMessage">Message de l'autorite</label>
-                <textarea placeholder="Ecrire ou copier ici le message de l'autorite a transmettre" name="vMessage"
-                  id="vMessage" title="Message de l'autorite" rows="12" onkeyup="AutoGrowTextArea(this)"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- ============ Bloc AMBIANCE / SITUATION ============ -->
-          <div id="blocSOIE">
-            <div class="section-title" id="titreSOIE">Message d'ambiance</div>
-
-            <div class="grid-container">
-              <div class="form-group">
-                <label for="vJeSuis">Je suis</label>
-                <textarea placeholder="Position, localisation, moyens engages..." name="vJeSuis" id="vJeSuis"
-                  title="Je suis" rows="3" onkeyup="AutoGrowTextArea(this)"></textarea>
-              </div>
-            </div>
-
-            <div class="grid-container">
-              <div class="form-group">
-                <label for="vJeVois">Je vois</label>
-                <textarea placeholder="Constat objectif de la situation observee..." name="vJeVois" id="vJeVois"
-                  title="Je vois" rows="4" onkeyup="AutoGrowTextArea(this)"></textarea>
-              </div>
-            </div>
-
-            <div class="grid-container">
-              <div class="form-group">
-                <label for="vJeFais">Je fais</label>
-                <textarea placeholder="Actions engagees ou en cours..." name="vJeFais" id="vJeFais" title="Je fais"
-                  rows="4" onkeyup="AutoGrowTextArea(this)"></textarea>
-              </div>
-            </div>
-
-            <div class="grid-container">
-              <div class="form-group">
-                <label for="vJeDemande">Je demande</label>
-                <textarea placeholder="Moyens, renforts, instructions demandes..." name="vJeDemande" id="vJeDemande"
-                  title="Je demande" rows="3" onkeyup="AutoGrowTextArea(this)"></textarea>
-              </div>
+          <!-- Commentaire -->
+          <div class="grid-container">
+            <div class="form-group">
+              <label for="vCommentaire">Commentaire</label>
+              <textarea placeholder="Ex : Message bien recu et transmis au COD a 14h40. 73" name="vCommentaire"
+                id="vCommentaire" title="Commentaire libre" rows="7" required
+                onkeyup="AutoGrowTextArea(this)"></textarea>
             </div>
           </div>
 
@@ -686,7 +534,7 @@
     </div>
 
     <div class="footer no-print">
-      <span id="version" class="footer-text">ADRASEC 06 - Message v1.0.0</span>
+      <span id="version" class="footer-text">ADRASEC 06 - AR v1.0.0</span>
       <span id="brand" class="adrasec-text">ADRASEC 06</span>
       <span id="projectLink" class="footer-text">Winlink Template</span>
     </div>
@@ -698,45 +546,34 @@
     <div class="help-container">
       <button id="close-btn" class="close-btn" type="button">Fermer</button>
       <div class="help-content">
-        <h2>Aide a la redaction</h2>
+        <h2>Accuse de reception</h2>
 
         <div class="info">
-          Le formulaire s'adapte au <b>type de message</b> choisi en haut de page.
+          Ce formulaire s'ouvre automatiquement lorsque vous repondez a un message
+          ADRASEC 06. Le numero, le destinataire et la reference sont deja remplis.
         </div>
 
-        <h3>Message d'ambiance</h3>
-        <p>Premier compte rendu depuis le terrain, transmis des l'arrivee sur les lieux.
-          Il donne une premiere image de la situation.</p>
-
-        <h3>Message de situation</h3>
-        <p>Compte rendu periodique qui actualise l'ambiance : evolution, moyens, besoins.</p>
-
-        <h3>Message encapsule</h3>
-        <p>Transport d'un message redige par une autorite. Le radioamateur n'en est pas
-          l'auteur : il indique l'autorite d'origine et l'autorite destinataire, puis
-          recopie le texte sans le modifier.</p>
-
-        <h3>Les quatre rubriques</h3>
+        <h3>Champs pre-remplis</h3>
         <ul>
-          <li><b>Je suis</b> : ou je me trouve, avec quels moyens.</li>
-          <li><b>Je vois</b> : ce que j'observe, sans interpretation.</li>
-          <li><b>Je fais</b> : les actions que j'ai engagees.</li>
-          <li><b>Je demande</b> : les moyens ou instructions dont j'ai besoin.</li>
+          <li><b>N&deg; de l'AR</b> : identifiant du message accuse, ou numero de sequence
+            si Winlink ne le fournit pas. Modifiable.</li>
+          <li><b>Date / Heure</b> : instant de l'accuse, bouton UTC / LOC pour changer de fuseau.</li>
+          <li><b>Origine</b> : votre indicatif.</li>
+          <li><b>Destinataire</b> : la station qui a emis le message accuse.</li>
+          <li><b>Reference</b> : sujet du message recu, avec sa priorite et son numero.</li>
+        </ul>
+
+        <h3>Champs a saisir</h3>
+        <ul>
+          <li><b>Priorite</b> : en principe Routine, sauf si l'accuse lui-meme est urgent.</li>
+          <li><b>Commentaire</b> : ce que vous avez fait du message. Une remise a l'autorite
+            destinataire se mentionne ici, avec son heure.</li>
         </ul>
 
         <div class="warning">
-          Les accents sur les majuscules sont supprimes automatiquement a l'envoi
-          (contrainte de transmission Winlink).
+          Un accuse de reception confirme la prise en compte du message par l'operateur,
+          ce que la confirmation automatique de Winlink ne fait pas.
         </div>
-
-        <h3>Champs</h3>
-        <ul>
-          <li><b>N&deg; du message</b> : pre-rempli par Winlink, modifiable.</li>
-          <li><b>Date / Heure</b> : bouton UTC / LOC pour basculer de fuseau.</li>
-          <li><b>Origine</b> : indicatif de la station emettrice (fond jaune).</li>
-          <li><b>Destinataire(s)</b> : indicatifs separes par des points-virgules.</li>
-          <li><b>Autorites</b> (fond vert) : uniquement pour un message encapsule.</li>
-        </ul>
       </div>
     </div>
   </div>

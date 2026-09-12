@@ -1,16 +1,14 @@
-﻿Form: ADRASEC06_Message_Initial.html, ADRASEC06_Message_Viewer.html
-ReplyTemplate: AR ADRASEC 06.txt
+﻿Form: ADRASEC06_AR_Initial.html, ADRASEC06_AR_Viewer.html
 SeqInc:
 To: <var vTo>
-Subject: [<var Priority>][<var vType>/<var vNumero>] <var vSujet>
+Subject: [<var Priority>][AR/<var vNumero>] <var vRef>
 Msg:
 ------------------------------------------------------------------------
--- <var vTypeLib>
+-- ACCUSE DE RECEPTION
 ------------------------------------------------------------------------
 
-Message N°: <var vNumero>
+N° de l'AR: AR/<var vNumero>
 Priorité: <var Priority>
-Demande AR: <var Dem_Rep>
 
 Date: <var vDate>
 Heure: <var vHeure>
@@ -19,11 +17,15 @@ Indicatif de la station: <var msgSender>
 ------------------------------------------------------------------------
 
 Origine: <var vOrigine>
-Destinataire(s): <var vTo>
+Destinataire: <var vTo>
+
+Référence du message accusé: <var vRef>
 
 ------------------------------------------------------------------------
 
-<var vCorps>
+Commentaire:
+<var vCommentaire>
+
 ------------------------------------------------------------------------
 Express Sending Station: <MsgSender>
 Express Version: <ProgramVersion>
