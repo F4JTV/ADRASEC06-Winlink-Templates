@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+
+<!--
+--------------------------------------------------------------------------
+-- Modele Winlink ADRASEC 06 - Formulaire de saisie
+-- Message d'ambiance / Message de situation / Message encapsule
+-- Gabarit visuel inspire des modeles FNRASEC (F4IXH - MIT)
+--------------------------------------------------------------------------
+-->
+
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Modele Winlink ADRASEC 06">
+  <meta name="version" content="1.0.0">
+  <title>Accuse de reception ADRASEC 06</title>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 10px;
+      padding: 0px;
+      display: flex;
+      justify-content: left;
+      align-items: top;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    a { color: #007bff; text-decoration: none; }
+    a:hover { color: #0056b3; text-decoration: underline; }
+
+    hr {
+      border: none;
+      border-top: 1px dotted #333;
+    }
+
+    pre { margin: 0; }
+
+    input[type="radio"] {
+      transform: scale(1.3);
+      margin-right: 5px;
+      margin-top: 0;
+    }
+
+    .spacer { margin-top: 18px; margin-bottom: 18px; }
+
+    .container {
+      background-color: #ffffff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 850px;
+    }
+
+    .main-content { padding: 0; min-height: 60vh; }
+
+    .grid-container { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    .grid-container2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-container3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+    @media print {
+      @page { margin: 0; }
+      body { padding: 10px; }
+      .no-print, .no-print * { display: none !important; }
+      .container {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        width: 100%;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid-container, .grid-container2, .grid-container3 { grid-template-columns: 1fr; }
+    }
+
+    /* header */
+    .header {
+      text-align: left;
+      margin-bottom: 1.3rem;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+    }
+
+    .header div.left { text-align: left; }
+    .header div.center { text-align: center; }
+
+    .header img { max-height: 110px; width: auto; }
+
+    .header h1 {
+      font-size: 1.5em;
+      margin: 0.5em;
+      margin-bottom: 0.8rem;
+      text-align: center;
+    }
+
+    .header h1 img { max-height: 25px; width: auto; translate: 0 5px; }
+
+    /* Logos vectoriels du bandeau */
+    .header svg.logo {
+      height: 110px;
+      width: auto;
+      display: inline-block;
+    }
+
+    @media (max-width: 600px) {
+      .header svg.logo { height: 72px; }
+    }
+
+    /* form */
+    .form-group { margin-bottom: 0.5rem; margin-top: 0.5rem; }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      color: #333;
+      font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 0.875rem;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .form-group textarea { min-width: 100%; }
+    .form-group select { padding: 0.3rem; margin-bottom: 0; }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .form-group input.bg-yellow,
+    .form-group select.bg-yellow { background-color: lightyellow; }
+
+    .form-group input.bg-green,
+    .form-group textarea.bg-green { background-color: lightgreen; }
+
+    .radio-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 8px;
+    }
+
+    .radio-group div { display: flex; align-items: center; gap: 3px; }
+
+    .radio-group span { font-weight: bold; font-size: 0.875rem; }
+    .radio-group .red { color: red; }
+    .radio-group .orange { color: orange; }
+    .radio-group .green { color: green; }
+    .radio-group .blue { color: #007bff; }
+
+    .button { display: flex; justify-content: center; margin: 20px; }
+
+    .form-group button {
+      padding: 0.5rem 1rem;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 0.875rem;
+    }
+
+    .form-group button:hover { background-color: #0056b3; }
+
+    .section-title {
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: #004085;
+      border-left: 4px solid #007bff;
+      padding-left: 8px;
+      margin-top: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    /* footer */
+    .footer {
+      width: 100%;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      text-align: center;
+      font-style: italic;
+      margin-top: 0.5rem;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    .adrasec-text {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 0.5rem;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    /* help */
+    .help-panel {
+      width: 30%;
+      min-width: 300px;
+      padding: 0;
+      margin: 0;
+      background-color: #f4f4f9;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.3s;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+    }
+
+    .help-container { padding: 20px; }
+    .help-panel.active { transform: translateX(0); }
+    div.help-content { color: #333; margin-top: 30px; }
+    .help-panel li { margin-bottom: 10px; }
+
+    .help-panel .close-btn {
+      background: #ddd;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 4px 10px;
+      float: left;
+    }
+
+    .warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .info {
+      background-color: #cfe2ff;
+      border: 1px solid #b6d4fe;
+      color: #004085;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+  </style>
+
+  <script type="text/javascript">
+    //==================================================================
+    // Fonctions communes (adaptees de CommonFunctions.js - FNRASEC)
+    //==================================================================
+
+    function AutoGrowTextArea(textField) {
+      if (textField.clientHeight < textField.scrollHeight) {
+        textField.style.height = textField.scrollHeight + "px";
+        if (textField.clientHeight < textField.scrollHeight) {
+          textField.style.height = (textField.scrollHeight * 2 - textField.clientHeight) + "px";
+        }
+      }
+    }
+
+    function removeUppercaseAccent(text) {
+      let t = text.replace(/[\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5]/g, "A");
+      t = t.replace(/[\u00C8\u00C9\u00CA\u00CB]/g, "E");
+      t = t.replace(/[\u00CC\u00CD\u00CE\u00CF]/g, "I");
+      t = t.replace(/[\u00D2\u00D3\u00D4\u00D5\u00D6]/g, "O");
+      t = t.replace(/[\u00D9\u00DA\u00DB\u00DC]/g, "U");
+      t = t.replace(/[\u00C7]/g, "C");
+      return t;
+    }
+
+    // Restauration des accents mal encodes dans les valeurs heritees du message recu
+    function setacc(s) {
+      let c = s;
+      c = c.replace(/\u00C3\u00A2/g, "\u00E2");
+      c = c.replace(/\u00C3\u00A9/g, "\u00E9");
+      c = c.replace(/\u00C3\u00A8/g, "\u00E8");
+      c = c.replace(/\u00C3\u00AA/g, "\u00EA");
+      c = c.replace(/\u00C3\u00AB/g, "\u00EB");
+      c = c.replace(/\u00C3\u00AE/g, "\u00EE");
+      c = c.replace(/\u00C3\u00AF/g, "\u00EF");
+      c = c.replace(/\u00C3\u00B4/g, "\u00F4");
+      c = c.replace(/\u00C3\u00B9/g, "\u00F9");
+      c = c.replace(/\u00C3\u00BB/g, "\u00FB");
+      c = c.replace(/\u00C3\u00A7/g, "\u00E7");
+      c = c.replace(/\u00C2\u00B0/g, "\u00B0");
+      c = c.replace(/\u00E2\u20AC\u2122/g, "'");
+      return c;
+    }
+
+    // Date et heure locales
+    function SetDateHeureLocale() {
+      var d = new Date();
+      document.getElementById("vDate").value =
+        d.getFullYear() + '-' +
+        ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + d.getDate()).slice(-2);
+      document.getElementById("vHeure").value =
+        ('0' + d.getHours()).slice(-2) + ':' +
+        ('0' + d.getMinutes()).slice(-2) + ' (LOC)';
+    }
+
+    //==================================================================
+    // Initialisation
+    //==================================================================
+    function init() {
+      document.getElementById('help-link').addEventListener('click', function (event) {
+        event.preventDefault();
+        document.getElementById('help-panel').classList.add('active');
+      });
+      document.getElementById('close-btn').addEventListener('click', function () {
+        document.getElementById('help-panel').classList.remove('active');
+      });
+
+      SetDateHeureLocale();
+
+      // Numero de l'AR : identifiant du message accuse, sinon numero de sequence
+      var numero = '{MsgOriginalID}';
+      if (!numero || numero.indexOf('{') === 0) numero = '{SeqNum}';
+      document.getElementById("vNumero").value = numero;
+
+      // La reference heritee du message recu peut contenir des accents mal encodes
+      var ref = document.getElementById("vRef");
+      ref.value = setacc(ref.value);
+      AutoGrowTextArea(ref);
+    }
+
+    //==================================================================
+    // Envoi
+    //==================================================================
+    function onSubmit() {
+      var champs = ["vOrigine", "vTo", "vRef", "vCommentaire"];
+      for (var i = 0; i < champs.length; i++) {
+        var el = document.getElementById(champs[i]);
+        el.value = removeUppercaseAccent(el.value);
+      }
+      return confirm('Cliquez sur OK et fermez la fenetre de navigateur vide.');
+    }
+  </script>
+
+</head>
+
+<body onload="init()">
+  <div class="container">
+
+    <div class="header">
+      <div class="left">
+        <svg class="logo" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 320 320"
+          role="img" aria-label="Logo ADRASEC 06 - Securite Civile">
+          <title>A.D.R.A.S.E.C 06 - Securite Civile</title>
+          <defs>
+            <radialGradient id="adrOrange" cx="42%" cy="34%" r="78%">
+              <stop offset="0%" stop-color="#FFB347" />
+              <stop offset="55%" stop-color="#F58215" />
+              <stop offset="100%" stop-color="#D95E00" />
+            </radialGradient>
+            <linearGradient id="adrBleu" x1="20%" y1="0%" x2="85%" y2="100%">
+              <stop offset="0%" stop-color="#3F5CFF" />
+              <stop offset="55%" stop-color="#1B2FE0" />
+              <stop offset="100%" stop-color="#0A159E" />
+            </linearGradient>
+            <path id="adrArcHaut" d="M 51.0,199.7 A 116,116 0 1,1 269.0,199.7" fill="none" />
+            <path id="adrArcBas" d="M 19.1,211.3 A 150,150 0 0,0 300.9,211.3" fill="none" />
+          </defs>
+          <circle cx="160" cy="160" r="156" fill="none" stroke="#0A159E" stroke-width="4" />
+          <circle cx="160" cy="160" r="108" fill="url(#adrOrange)" />
+          <circle cx="160" cy="160" r="108" fill="none" stroke="#0A159E" stroke-width="3" />
+          <polygon points="160,52 253.5,214 66.5,214" fill="url(#adrBleu)" stroke="#08117F" stroke-width="3"
+            stroke-linejoin="round" />
+          <g font-family="'Arial Black','Arial Bold',Arial,Helvetica,sans-serif" font-weight="bold" fill="#0F1FBE">
+            <text font-size="27" letter-spacing="1">
+              <textPath href="#adrArcHaut" xlink:href="#adrArcHaut" startOffset="50%"
+                text-anchor="middle">A.D.R.A.S.E.C 06</textPath>
+            </text>
+            <text font-size="26" letter-spacing="1.5">
+              <textPath href="#adrArcBas" xlink:href="#adrArcBas" startOffset="50%"
+                text-anchor="middle">SECURITE CIVILE</textPath>
+            </text>
+          </g>
+        </svg>
+      </div>
+      <div class="center">
+        <h1>Accuse de reception
+          <a href="#" id="help-link" title="Afficher l'aide en ligne">&#9432;</a>
+        </h1>
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <section id="main">
+        <form onsubmit="return onSubmit();" method="post" id="ADRASEC06ARForm" enctype="multipart/form-data"
+          action="http://{FormServer}:{FormPort}">
+
+          <input name="TemplateVersion" type="hidden" id="TemplateVersion" value="1.0.0" />
+          <input name="msgSender" type="hidden" id="msgSender" value="{Callsign}" />
+
+          <!-- N&deg; de l'AR / Priorite -->
+          <div class="grid-container3">
+            <div class="form-group">
+              <label for="vNumero">N&deg; de l'AR</label>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                <span style="font-weight: bold; color: #004085;">AR /</span>
+                <input title="Reference du message accuse, modifiable" name="vNumero" id="vNumero" value="{SeqNum}"
+                  size="8" maxlength="20" style="color: red;" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Priorite</label>
+              <div class="radio-group">
+                <div class="red">
+                  <input type="radio" name="Priority" value="IMMEDIAT">
+                  <span>Immediat</span>
+                </div>
+                <div class="orange">
+                  <input type="radio" name="Priority" value="URGENT">
+                  <span>Urgent</span>
+                </div>
+                <div class="green">
+                  <input type="radio" name="Priority" value="ROUTINE" checked>
+                  <span>Routine</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group"></div>
+          </div>
+
+          <!-- Date / Heure locales -->
+          <div class="grid-container2">
+            <div class="form-group">
+              <label for="vDate">Date</label>
+              <input id="vDate" name="vDate" placeholder="AAAA-MM-JJ" title="Date de l'accuse de reception" required />
+            </div>
+
+            <div class="form-group">
+              <label for="vHeure">Heure locale</label>
+              <input id="vHeure" name="vHeure" placeholder="HH:MM" title="Heure locale" required />
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+          <hr>
+
+          <!-- Origine / Destinataire -->
+          <div class="grid-container2">
+            <div class="form-group">
+              <label for="vOrigine">Origine</label>
+              <input name="vOrigine" id="vOrigine" title="Indicatif de la station qui accuse reception"
+                value="{Callsign}" size="20" maxlength="20" class="bg-yellow" required />
+            </div>
+
+            <div class="form-group">
+              <label for="vTo">Destinataire</label>
+              <input name="vTo" id="vTo" title="Indicatif de la station qui a emis le message accuse"
+                value="{MsgOriginalSender}" size="100" maxlength="100" class="bg-yellow" required />
+            </div>
+          </div>
+
+          <!-- Reference du message accuse -->
+          <div class="grid-container">
+            <div class="form-group">
+              <label for="vRef">Reference du message accuse</label>
+              <textarea name="vRef" id="vRef" title="Sujet du message recu, pre-rempli automatiquement" rows="1"
+                required onkeyup="AutoGrowTextArea(this)">{MsgOriginalSubject}</textarea>
+            </div>
+          </div>
+
+          <!-- Commentaire -->
+          <div class="grid-container">
+            <div class="form-group">
+              <label for="vCommentaire">Commentaire</label>
+              <textarea placeholder="Ex : Message bien recu et transmis au COD a 14h40. 73" name="vCommentaire"
+                id="vCommentaire" title="Commentaire libre" rows="7" required
+                onkeyup="AutoGrowTextArea(this)"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group button">
+            <button type="submit">Envoyer</button>
+          </div>
+
+        </form>
+      </section>
+
+    </div>
+
+    <div class="footer no-print">
+      <span id="version" class="footer-text">ADRASEC 06 - AR v1.0.0</span>
+      <span id="brand" class="adrasec-text">ADRASEC 06</span>
+      <span id="projectLink" class="footer-text">Winlink Template</span>
+    </div>
+
+  </div>
+
+  <!-- Panneau d'aide -->
+  <div id="help-panel" class="help-panel no-print">
+    <div class="help-container">
+      <button id="close-btn" class="close-btn" type="button">Fermer</button>
+      <div class="help-content">
+        <h2>Accuse de reception</h2>
+
+        <div class="info">
+          Ce formulaire s'ouvre automatiquement lorsque vous repondez a un message
+          ADRASEC 06. Le numero, le destinataire et la reference sont deja remplis.
+        </div>
+
+        <h3>Champs pre-remplis</h3>
+        <ul>
+          <li><b>N&deg; de l'AR</b> : identifiant du message accuse, ou numero de sequence
+            si Winlink ne le fournit pas. Modifiable.</li>
+          <li><b>Date / Heure</b> : instant de l'accuse, en heure locale.</li>
+          <li><b>Origine</b> : votre indicatif.</li>
+          <li><b>Destinataire</b> : la station qui a emis le message accuse.</li>
+          <li><b>Reference</b> : sujet du message recu, avec sa priorite et son numero.</li>
+        </ul>
+
+        <h3>Champs a saisir</h3>
+        <ul>
+          <li><b>Priorite</b> : en principe Routine, sauf si l'accuse lui-meme est urgent.</li>
+          <li><b>Commentaire</b> : ce que vous avez fait du message. Une remise a l'autorite
+            destinataire se mentionne ici, avec son heure.</li>
+        </ul>
+
+        <div class="warning">
+          Un accuse de reception confirme la prise en compte du message par l'operateur,
+          ce que la confirmation automatique de Winlink ne fait pas.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

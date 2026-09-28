@@ -29,6 +29,18 @@ Puis dans Winlink Express : *Message > New Message > Select Template* → dossie
 
 - **Message d'ambiance** / **Message de situation** → affiche les rubriques **Je suis / Je vois / Je fais / Je demande**. *Je suis*, *Je vois* et *Je fais* sont obligatoires, *Je demande* est facultatif.
 - **Message encapsulé** → affiche **Autorité d'origine**, **Autorité destinataire**, **Sujet** et **Message de l'autorité**, tous obligatoires.
+- **Procédure codifiée** → affiche les six rubriques normalisées :
+
+| Rubrique | Saisie |
+|---|---|
+| PAPA (position) | Commune + coordonnées + sélecteur de format (D° M' S", D° M.mmm', degrés décimaux) |
+| SIERRA (station) | Fixe / Mobile / Portable — choix unique |
+| GOLF (gamme) | HF / VHF / UHF / QO100 — cases à cocher, plusieurs possibles, au moins une exigée |
+| ECHO (électrique) | Secteur / Groupe électrogène / Panneaux solaires / Éolienne / Batterie — choix unique |
+| ALPHA (autonomie) | Nombre d'heures |
+| DELTA (disponibilité) | Nombre + unité Heures ou Minutes |
+
+  Un commentaire libre facultatif complète le bloc ; il n'apparaît dans le message et dans le viewer que s'il est rempli.
 
 Les champs masqués sont vidés à l'envoi : le texte transmis ne contient que les rubriques utiles.
 
@@ -36,21 +48,26 @@ Les champs masqués sont vidés à l'envoi : le texte transmis ne contient que l
 
 | Variable | Contenu |
 |---|---|
-| `vType` | `AMBIANCE`, `SITUATION` ou `ENCAPSULE` (utilisé dans le sujet) |
+| `vType` | `AMBIANCE`, `SITUATION`, `ENCAPSULE` ou `CODIFIEE` (utilisé dans le sujet) |
 | `vTypeLib` | Libellé en clair, calculé à l'envoi |
 | `vNumero` | N° du message (pré-rempli par `{SeqNum}`, auto-incrémenté via `SeqInc:`) |
 | `Priority` | `IMMEDIAT` / `URGENT` / `ROUTINE` |
 | `Dem_Rep` | `Oui` / `Non` |
-| `vDate`, `vHeure` | Date et heure, bascule UTC / Locale par le bouton |
+| `vDate`, `vHeure` | Date et heure locales, suffixées `(LOC)` |
 | `vOrigine` | Indicatif de la station émettrice (pré-rempli par `{msgSender}`) |
 | `vTo` | Indicatifs destinataires séparés par `;` |
 | `vAutOrig`, `vAutDest` | Autorités (encapsulé uniquement) |
 | `vSujet` | Sujet saisi (encapsulé) ou généré automatiquement (ambiance / situation) |
 | `vMessage` | Texte de l'autorité (encapsulé uniquement) |
 | `vJeSuis`, `vJeVois`, `vJeFais`, `vJeDemande` | Rubriques SOIE |
+| `vPapaCommune`, `vPapaGPS`, `vPapaFormat` | Rubrique PAPA |
+| `vSierra`, `vEcho` | Rubriques SIERRA et ECHO |
+| `vGolf` | Gammes cochées, assemblées à l'envoi (`HF, VHF`) |
+| `vAlpha`, `vDelta`, `vDeltaUnite` | Rubriques ALPHA et DELTA |
+| `vCommentaire` | Commentaire de la procédure codifiée |
 | `vCorps` | Corps mis en forme, assemblé à l'envoi — c'est lui qui est imprimé dans le message texte |
 
-Le sujet du message Winlink prend la forme : `[ROUTINE][AMBIANCE/017] MESSAGE D'AMBIANCE du 2026-09-10 14:32 (UTC)`
+Le sujet du message Winlink prend la forme : `[ROUTINE][AMBIANCE/017] MESSAGE D'AMBIANCE du 2026-09-10 14:32 (LOC)`
 
 ## Personnalisation
 
@@ -68,11 +85,13 @@ Pour retoucher les couleurs, modifier les dégradés `adrOrange` / `adrBleu` (lo
 
 **Version** — trois endroits : la balise `<meta name="version">`, le champ caché `TemplateVersion` de l'Initial, et le pied de page des deux fichiers.
 
+**Heure** — la date et l'heure sont toujours locales, renseignées automatiquement à l'ouverture du formulaire et modifiables à la main. L'heure porte le suffixe `(LOC)` pour lever toute ambiguïté chez le destinataire.
+
 **Accents** — les accents sur les majuscules sont supprimés à l'envoi (`removeUppercaseAccent`) et les accents minuscules sont restaurés à l'affichage (`setacc`), comme dans les modèles FNRASEC.
 
 ## Points de vérification avant mise en service
 
-1. Ouvrir `ADRASEC06_Message_Initial.html` dans un navigateur : basculer entre les trois types et vérifier l'affichage.
+1. Ouvrir `ADRASEC06_Message_Initial.html` dans un navigateur : basculer entre les quatre types et vérifier l'affichage.
 2. Faire un envoi réel vers soi-même (`vTo` = son propre indicatif) et contrôler le rendu du texte et du Viewer.
 3. Vérifier le comportement de l'auto-incrémentation `SeqInc:` sur deux messages consécutifs.
 
@@ -83,7 +102,7 @@ Le modèle principal déclare `ReplyTemplate: AR ADRASEC 06.txt` : le destinatai
 | Champ | Origine |
 |---|---|
 | N° de l'AR | `{MsgOriginalID}`, sinon `{SeqNum}` |
-| Date / Heure | horloge, bouton UTC / LOC |
+| Date / Heure | horloge locale |
 | Origine | `{Callsign}` |
 | Destinataire | `{MsgOriginalSender}` |
 | Référence du message accusé | `{MsgOriginalSubject}` |
