@@ -6,7 +6,7 @@ Formulaire unique avec bascule automatique selon le **type de message** choisi.
 
 | Fichier | Rôle |
 |---|---|
-| `Message ADRASEC 06.txt` | Définition du modèle (c'est ce nom qui apparaît dans la liste Winlink). Encodage UTF-8 avec BOM, fins de ligne CRLF. |
+| `Message ADRASEC 06.txt` | Définition du modèle (c'est ce nom qui apparaît dans la liste). ASCII pur, sans BOM, fins de ligne CRLF. |
 | `ADRASEC06_Message_Initial.html` | Formulaire de saisie |
 | `ADRASEC06_Message_Viewer.html` | Affichage / impression du message reçu |
 | `AR ADRASEC 06.txt` | Définition du modèle d'accusé de réception |
@@ -94,6 +94,43 @@ Pour retoucher les couleurs, modifier les dégradés `adrOrange` / `adrBleu` (lo
 1. Ouvrir `ADRASEC06_Message_Initial.html` dans un navigateur : basculer entre les quatre types et vérifier l'affichage.
 2. Faire un envoi réel vers soi-même (`vTo` = son propre indicatif) et contrôler le rendu du texte et du Viewer.
 3. Vérifier le comportement de l'auto-incrémentation `SeqInc:` sur deux messages consécutifs.
+
+## Installateur Windows
+
+Le dossier contient un script **Inno Setup 6** qui produit un `.exe` d'installation, pratique pour déployer les modèles sur les postes de l'association sans manipulation de dossiers.
+
+Compilation, depuis le dossier qui contient `ADRASEC06_Templates.iss` :
+
+```
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ADRASEC06_Templates.iss
+```
+
+Le résultat, `ADRASEC06_Templates_Setup_1.0.0.exe`, est autonome et distribuable tel quel.
+
+Ce que fait l'installateur :
+
+- il cherche Winlink Express dans les emplacements habituels et pré-remplit le dossier ; si `RMS Express.exe` est absent du dossier choisi, il prévient sans bloquer ;
+- il écrit les modèles dans `<Winlink>\Global Folders\Templates\ADRASEC06` ;
+- une case à cocher facultative dépose en plus une copie sur le Bureau, dans `ADRASEC06_WoAD`, avec un rappel de la marche à suivre pour le téléphone ;
+- il s'inscrit dans Ajout/Suppression de programmes et sait se désinstaller, en supprimant uniquement son propre sous-dossier de modèles.
+
+Fichiers du projet d'installation : `ADRASEC06_Templates.iss`, `setup_icon.ico`, `setup_wizard.bmp`, `setup_wizard_small.bmp`. Ils doivent rester à côté du dossier `ADRASEC06`, qui fournit les fichiers à installer.
+
+Pour changer de version, modifier `#define AppVersion` en tête du script ; le nom du `.exe` produit suit automatiquement.
+
+## Winlink Express et WoAD
+
+Les mêmes fichiers servent aux deux applications, sans adaptation. Ce qui change, c'est l'emplacement où les déposer.
+
+**Winlink Express** : un sous-dossier de `C:\RMS Express\Global Folders\Templates\`.
+
+**WoAD** : les fichiers doivent être dans le dossier applicatif de WoAD, soit `Android/data/com.sumusltd.woad/files/`, et *Settings → Message template → Other templates location* réglé sur **App-specific External** avec le chemin par défaut.
+
+Un dossier partagé sélectionné via le sélecteur de fichiers Android ne convient pas : WoAD y liste bien les `.txt`, mais n'ouvre pas les `.html` voisins. Il retombe alors silencieusement en mode texte et affiche le modèle brut, avec les `<var ...>` non résolus — symptôme trompeur qui ressemble à un défaut du modèle alors que les fichiers sont corrects.
+
+Le dossier `Android/data/...` est masqué par les explorateurs de fichiers Android ; le plus simple est de brancher le téléphone en USB et d'y copier les fichiers depuis un ordinateur. Redémarrer WoAD complètement après la copie.
+
+À savoir également : la WebView de WoAD **bloque `localStorage`**, ce qui casse certains modèles standards Winlink. Aucun de ces formulaires ne s'en sert.
 
 ## Accusé de réception
 
