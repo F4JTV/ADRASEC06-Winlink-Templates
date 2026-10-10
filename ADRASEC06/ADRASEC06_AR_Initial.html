@@ -315,30 +315,16 @@
       return c;
     }
 
-    // Bascule UTC / Locale sur les champs Date et Heure
-    function SetDateToUTC() {
+    // Date et heure locales
+    function SetDateHeureLocale() {
       var d = new Date();
-      var btn = document.getElementById("BtnDate");
-
-      if (btn.innerHTML == "UTC") {
-        document.getElementById("vDate").value =
-          d.getUTCFullYear() + '-' +
-          ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' +
-          ('0' + d.getUTCDate()).slice(-2);
-        document.getElementById("vHeure").value =
-          ('0' + d.getUTCHours()).slice(-2) + ':' +
-          ('0' + d.getUTCMinutes()).slice(-2) + ' (UTC)';
-        btn.innerHTML = "Locale";
-      } else {
-        document.getElementById("vDate").value =
-          d.getFullYear() + '-' +
-          ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
-          ('0' + d.getDate()).slice(-2);
-        document.getElementById("vHeure").value =
-          ('0' + d.getHours()).slice(-2) + ':' +
-          ('0' + d.getMinutes()).slice(-2) + ' (LOC)';
-        btn.innerHTML = "UTC";
-      }
+      document.getElementById("vDate").value =
+        d.getFullYear() + '-' +
+        ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + d.getDate()).slice(-2);
+      document.getElementById("vHeure").value =
+        ('0' + d.getHours()).slice(-2) + ':' +
+        ('0' + d.getMinutes()).slice(-2) + ' (LOC)';
     }
 
     //==================================================================
@@ -353,7 +339,7 @@
         document.getElementById('help-panel').classList.remove('active');
       });
 
-      SetDateToUTC();
+      SetDateHeureLocale();
 
       // Numero de l'AR : identifiant du message accuse, sinon numero de sequence
       var numero = '{MsgOriginalID}';
@@ -469,21 +455,16 @@
             <div class="form-group"></div>
           </div>
 
-          <!-- Date / Heure -->
-          <div class="grid-container3">
+          <!-- Date / Heure locales -->
+          <div class="grid-container2">
             <div class="form-group">
               <label for="vDate">Date</label>
               <input id="vDate" name="vDate" placeholder="AAAA-MM-JJ" title="Date de l'accuse de reception" required />
             </div>
 
             <div class="form-group">
-              <label for="vHeure">Heure</label>
-              <input id="vHeure" name="vHeure" placeholder="HH:MM" title="Heure UTC par defaut" required />
-            </div>
-
-            <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button style="height: 34px;" id="BtnDate" type="button" onclick="SetDateToUTC()"
-                title="Cliquer pour basculer en heure UTC ou Locale">UTC / LOC</button>
+              <label for="vHeure">Heure locale</label>
+              <input id="vHeure" name="vHeure" placeholder="HH:MM" title="Heure locale" required />
             </div>
           </div>
 
@@ -557,7 +538,7 @@
         <ul>
           <li><b>N&deg; de l'AR</b> : identifiant du message accuse, ou numero de sequence
             si Winlink ne le fournit pas. Modifiable.</li>
-          <li><b>Date / Heure</b> : instant de l'accuse, bouton UTC / LOC pour changer de fuseau.</li>
+          <li><b>Date / Heure</b> : instant de l'accuse, en heure locale.</li>
           <li><b>Origine</b> : votre indicatif.</li>
           <li><b>Destinataire</b> : la station qui a emis le message accuse.</li>
           <li><b>Reference</b> : sujet du message recu, avec sa priorite et son numero.</li>

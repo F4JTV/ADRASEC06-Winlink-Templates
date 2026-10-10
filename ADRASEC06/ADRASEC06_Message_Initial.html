@@ -156,17 +156,27 @@
     .radio-group {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
       padding-top: 8px;
     }
 
+    .radio-group input[type="checkbox"] {
+      transform: scale(1.3);
+      margin-right: 5px;
+      margin-top: 0;
+    }
+
     .radio-group div { display: flex; align-items: center; gap: 3px; }
+    /* Repli pour les moteurs sans support de 'gap' */
+    .radio-group > div { margin-right: 8px; }
 
     .radio-group span { font-weight: bold; font-size: 0.875rem; }
     .radio-group .red { color: red; }
     .radio-group .orange { color: orange; }
     .radio-group .green { color: green; }
     .radio-group .blue { color: #007bff; }
+    .radio-group .purple { color: #6f42c1; }
 
     .button { display: flex; justify-content: center; margin: 20px; }
 
@@ -182,6 +192,48 @@
     }
 
     .form-group button:hover { background-color: #0056b3; }
+
+    /* Rubriques de la procedure codifiee */
+    .rubrique {
+      border: 1px solid #d7dee8;
+      border-radius: 6px;
+      margin-bottom: 0.7rem;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+
+    .rubrique-titre {
+      background-color: #eef3fb;
+      border-bottom: 1px solid #d7dee8;
+      border-left: 5px solid #007bff;
+      padding: 0.45rem 0.8rem;
+      color: #004085;
+      font-size: 0.9rem;
+    }
+
+    .rubrique-titre b { letter-spacing: 1.5px; }
+
+    .rubrique-titre span {
+      color: #6c757d;
+      font-size: 0.8rem;
+      margin-left: 8px;
+    }
+
+    .rubrique-corps { padding: 0.6rem 0.8rem 0.8rem 0.8rem; }
+
+    .rubrique-corps .form-group { margin-top: 0.2rem; margin-bottom: 0.2rem; }
+    .rubrique-corps .radio-group { padding-top: 0.2rem; }
+
+    .champ-court { max-width: 130px; }
+
+    .unite {
+      font-size: 0.875rem;
+      color: #555;
+      white-space: nowrap;
+      padding-bottom: 0.55rem;
+    }
+
+    .ligne-champ { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 
     .section-title {
       font-weight: bold;
@@ -298,50 +350,50 @@
       return t;
     }
 
-    // Bascule UTC / Locale sur les champs Date et Heure
-    function SetDateToUTC() {
+    // Date et heure locales
+    function SetDateHeureLocale() {
       var d = new Date();
-      var btn = document.getElementById("BtnDate");
-
-      if (btn.innerHTML == "UTC") {
-        document.getElementById("vDate").value =
-          d.getUTCFullYear() + '-' +
-          ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' +
-          ('0' + d.getUTCDate()).slice(-2);
-        document.getElementById("vHeure").value =
-          ('0' + d.getUTCHours()).slice(-2) + ':' +
-          ('0' + d.getUTCMinutes()).slice(-2) + ' (UTC)';
-        btn.innerHTML = "Locale";
-      } else {
-        document.getElementById("vDate").value =
-          d.getFullYear() + '-' +
-          ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
-          ('0' + d.getDate()).slice(-2);
-        document.getElementById("vHeure").value =
-          ('0' + d.getHours()).slice(-2) + ':' +
-          ('0' + d.getMinutes()).slice(-2) + ' (LOC)';
-        btn.innerHTML = "UTC";
-      }
+      document.getElementById("vDate").value =
+        d.getFullYear() + '-' +
+        ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + d.getDate()).slice(-2);
+      document.getElementById("vHeure").value =
+        ('0' + d.getHours()).slice(-2) + ':' +
+        ('0' + d.getMinutes()).slice(-2) + ' (LOC)';
     }
 
     //==================================================================
     // Gestion du type de message
     //==================================================================
-    function getTypeMessage() {
-      var radios = document.getElementsByName("vType");
+    function getRadioValue(nom) {
+      var radios = document.getElementsByName(nom);
       for (var i = 0; i < radios.length; i++) {
         if (radios[i].checked) return radios[i].value;
       }
       return "";
     }
 
+    function setRadioRequired(nom, obligatoire) {
+      var radios = document.getElementsByName(nom);
+      for (var i = 0; i < radios.length; i++) {
+        radios[i].required = obligatoire;
+      }
+    }
+
+    function getTypeMessage() {
+      return getRadioValue("vType");
+    }
+
     function setFormType() {
       var type = getTypeMessage();
       var encapsule = (type === "ENCAPSULE");
+      var codifiee = (type === "CODIFIEE");
+      var soie = (!encapsule && !codifiee);
 
       document.getElementById("blocAutorites").style.display = encapsule ? "" : "none";
       document.getElementById("blocEncapsule").style.display = encapsule ? "" : "none";
-      document.getElementById("blocSOIE").style.display = encapsule ? "none" : "";
+      document.getElementById("blocSOIE").style.display = soie ? "" : "none";
+      document.getElementById("blocCodifiee").style.display = codifiee ? "" : "none";
 
       // Champs obligatoires selon le type
       document.getElementById("vAutOrig").required = encapsule;
@@ -349,19 +401,29 @@
       document.getElementById("vSujet").required = encapsule;
       document.getElementById("vMessage").required = encapsule;
 
-      document.getElementById("vJeSuis").required = !encapsule;
-      document.getElementById("vJeVois").required = !encapsule;
-      document.getElementById("vJeFais").required = !encapsule;
+      document.getElementById("vJeSuis").required = soie;
+      document.getElementById("vJeVois").required = soie;
+      document.getElementById("vJeFais").required = soie;
       document.getElementById("vJeDemande").required = false;
 
+      document.getElementById("vPapaCommune").required = codifiee;
+      document.getElementById("vPapaGPS").required = codifiee;
+      document.getElementById("vAlpha").required = codifiee;
+      document.getElementById("vDelta").required = codifiee;
+      setRadioRequired("vSierra", codifiee);
+      setRadioRequired("vEcho", codifiee);
+
       // Titre du bloc SOIE
-      document.getElementById("titreSOIE").innerHTML =
-        (type === "AMBIANCE") ? "Message d'ambiance" : "Message de situation";
+      if (soie) {
+        document.getElementById("titreSOIE").innerHTML =
+          (type === "AMBIANCE") ? "Message d'ambiance" : "Message de situation";
+      }
     }
 
     function libelleType(type) {
       if (type === "AMBIANCE") return "MESSAGE D'AMBIANCE";
       if (type === "SITUATION") return "MESSAGE DE SITUATION";
+      if (type === "CODIFIEE") return "PROCEDURE CODIFIEE";
       return "MESSAGE ENCAPSULE";
     }
 
@@ -377,7 +439,7 @@
         document.getElementById('help-panel').classList.remove('active');
       });
 
-      SetDateToUTC();
+      SetDateHeureLocale();
       setFormType();
     }
 
@@ -392,25 +454,50 @@
     function onSubmit() {
       var type = getTypeMessage();
       var encapsule = (type === "ENCAPSULE");
+      var codifiee = (type === "CODIFIEE");
+      var soie = (!encapsule && !codifiee);
+      var i;
+
+      // GOLF : assemblage des gammes cochees
+      var gammes = [];
+      var casesGolf = ["vGolfHF", "vGolfVHF", "vGolfUHF", "vGolfQO100"];
+      for (i = 0; i < casesGolf.length; i++) {
+        var caseGolf = document.getElementById(casesGolf[i]);
+        if (caseGolf.checked) gammes.push(caseGolf.value);
+      }
+      if (codifiee && gammes.length === 0) {
+        alert("GOLF : indiquez au moins une gamme de frequences.");
+        return false;
+      }
+      document.getElementById("vGolf").value = gammes.join(", ");
 
       // Nettoyage des accents majuscules
       var champs = ["vOrigine", "vTo", "vAutOrig", "vAutDest", "vSujet",
-                    "vMessage", "vJeSuis", "vJeVois", "vJeFais", "vJeDemande"];
-      for (var i = 0; i < champs.length; i++) {
+                    "vMessage", "vJeSuis", "vJeVois", "vJeFais", "vJeDemande",
+                    "vPapaCommune", "vPapaGPS", "vCommentaire"];
+      for (i = 0; i < champs.length; i++) {
         var el = document.getElementById(champs[i]);
         el.value = removeUppercaseAccent(el.value);
       }
 
       // Vide les champs non utilises pour ne pas polluer le message
-      if (encapsule) {
+      if (!encapsule) {
+        document.getElementById("vAutOrig").value = "";
+        document.getElementById("vAutDest").value = "";
+        document.getElementById("vMessage").value = "";
+      }
+      if (!soie) {
         document.getElementById("vJeSuis").value = "";
         document.getElementById("vJeVois").value = "";
         document.getElementById("vJeFais").value = "";
         document.getElementById("vJeDemande").value = "";
-      } else {
-        document.getElementById("vAutOrig").value = "";
-        document.getElementById("vAutDest").value = "";
-        document.getElementById("vMessage").value = "";
+      }
+      if (!codifiee) {
+        var champsCodifiee = ["vPapaCommune", "vPapaGPS", "vAlpha", "vDelta",
+                              "vGolf", "vCommentaire"];
+        for (i = 0; i < champsCodifiee.length; i++) {
+          document.getElementById(champsCodifiee[i]).value = "";
+        }
       }
 
       // Corps du message (texte transmis)
@@ -419,6 +506,23 @@
         corps += "Autorite origine       : " + document.getElementById("vAutOrig").value + "\n";
         corps += "Autorite destinataire  : " + document.getElementById("vAutDest").value + "\n\n";
         corps += bloc("MESSAGE DE L'AUTORITE", document.getElementById("vMessage").value);
+      } else if (codifiee) {
+        var commune = document.getElementById("vPapaCommune").value;
+        var gps = document.getElementById("vPapaGPS").value;
+        var format = document.getElementById("vPapaFormat").value;
+        var position = commune;
+        if (gps) position += " - " + gps + " (" + format + ")";
+
+        corps += "PAPA   (position)      : " + position + "\n";
+        corps += "SIERRA (station)       : " + getRadioValue("vSierra") + "\n";
+        corps += "GOLF   (gamme)         : " + document.getElementById("vGolf").value + "\n";
+        corps += "ECHO   (electrique)    : " + getRadioValue("vEcho") + "\n";
+        corps += "ALPHA  (autonomie)     : " + document.getElementById("vAlpha").value + " Heures\n";
+        corps += "DELTA  (disponibilite) : " + document.getElementById("vDelta").value
+               + " " + document.getElementById("vDeltaUnite").value + "\n\n";
+
+        var commentaire = document.getElementById("vCommentaire").value;
+        if (commentaire) corps += bloc("COMMENTAIRE", commentaire);
       } else {
         corps += bloc("JE SUIS", document.getElementById("vJeSuis").value);
         corps += bloc("JE VOIS", document.getElementById("vJeVois").value);
@@ -506,6 +610,7 @@
           <input name="TemplateVersion" type="hidden" id="TemplateVersion" value="1.0.0" />
           <input name="msgSender" type="hidden" id="msgSender" value="{Callsign}" />
           <input name="vTypeLib" type="hidden" id="vTypeLib" value="" />
+          <input name="vGolf" type="hidden" id="vGolf" value="" />
           <textarea name="vCorps" id="vCorps" style="display:none;"></textarea>
 
           <!-- Type de message -->
@@ -525,6 +630,10 @@
                 <div class="blue">
                   <input type="radio" name="vType" id="typeEncapsule" value="ENCAPSULE" onclick="setFormType()">
                   <span>Message encapsule</span>
+                </div>
+                <div class="purple">
+                  <input type="radio" name="vType" id="typeCodifiee" value="CODIFIEE" onclick="setFormType()">
+                  <span>Procedure codifiee</span>
                 </div>
               </div>
             </div>
@@ -566,21 +675,16 @@
             </div>
           </div>
 
-          <!-- Date / Heure -->
-          <div class="grid-container3">
+          <!-- Date / Heure locales -->
+          <div class="grid-container2">
             <div class="form-group">
               <label for="vDate">Date</label>
               <input id="vDate" name="vDate" placeholder="AAAA-MM-JJ" title="Date du message" required />
             </div>
 
             <div class="form-group">
-              <label for="vHeure">Heure</label>
-              <input id="vHeure" name="vHeure" placeholder="HH:MM" title="Heure UTC par defaut" required />
-            </div>
-
-            <div class="form-group" style="display: flex; align-items: flex-end;">
-              <button style="height: 34px;" id="BtnDate" type="button" onclick="SetDateToUTC()"
-                title="Cliquer pour basculer en heure UTC ou Locale">UTC / LOC</button>
+              <label for="vHeure">Heure locale</label>
+              <input id="vHeure" name="vHeure" placeholder="HH:MM" title="Heure locale" required />
             </div>
           </div>
 
@@ -676,6 +780,152 @@
             </div>
           </div>
 
+          <!-- ============ Bloc PROCEDURE CODIFIEE ============ -->
+          <div id="blocCodifiee">
+            <div class="section-title">Procedure codifiee</div>
+
+            <div class="rubrique">
+              <div class="rubrique-titre"><b>PAPA</b><span>Position</span></div>
+              <div class="rubrique-corps">
+                <div class="grid-container3">
+                  <div class="form-group">
+                    <label for="vPapaCommune">Commune</label>
+                    <input name="vPapaCommune" id="vPapaCommune" title="Commune ou lieu-dit"
+                      placeholder="Ex : Grasse" maxlength="60" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="vPapaGPS">Coordonnees</label>
+                    <input name="vPapaGPS" id="vPapaGPS" title="Coordonnees GPS"
+                      placeholder="Ex : 43 39 34 N 006 55 26 E" maxlength="60" />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="vPapaFormat">Format</label>
+                    <select name="vPapaFormat" id="vPapaFormat" title="Format des coordonnees transmises">
+                      <option value="D M S">D&deg; M' S&quot;</option>
+                      <option value="D M.mmm">D&deg; M.mmm'</option>
+                      <option value="D.dddd">Degres decimaux</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rubrique">
+              <div class="rubrique-titre"><b>SIERRA</b><span>Station</span></div>
+              <div class="rubrique-corps">
+                <div class="radio-group">
+                  <div>
+                    <input type="radio" name="vSierra" id="vSierraFixe" value="Fixe">
+                    <span>Fixe</span>
+                  </div>
+                  <div>
+                    <input type="radio" name="vSierra" id="vSierraMobile" value="Mobile">
+                    <span>Mobile</span>
+                  </div>
+                  <div>
+                    <input type="radio" name="vSierra" id="vSierraPortable" value="Portable">
+                    <span>Portable</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rubrique">
+              <div class="rubrique-titre"><b>GOLF</b><span>Gammes exploitables</span></div>
+              <div class="rubrique-corps">
+                <div class="radio-group">
+                  <div>
+                    <input type="checkbox" name="vGolfHF" id="vGolfHF" value="HF">
+                    <span>HF</span>
+                  </div>
+                  <div>
+                    <input type="checkbox" name="vGolfVHF" id="vGolfVHF" value="VHF">
+                    <span>VHF</span>
+                  </div>
+                  <div>
+                    <input type="checkbox" name="vGolfUHF" id="vGolfUHF" value="UHF">
+                    <span>UHF</span>
+                  </div>
+                  <div>
+                    <input type="checkbox" name="vGolfQO100" id="vGolfQO100" value="QO100">
+                    <span>QO100</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rubrique">
+              <div class="rubrique-titre"><b>ECHO</b><span>Alimentation</span></div>
+              <div class="rubrique-corps">
+                <div class="radio-group">
+                  <div>
+                    <input type="radio" name="vEcho" id="vEchoSecteur" value="Secteur">
+                    <span>Secteur</span>
+                  </div>
+                  <div>
+                    <input type="radio" name="vEcho" id="vEchoGroupe" value="Groupe electrogene">
+                    <span>Groupe electrogene</span>
+                  </div>
+                  <div>
+                    <input type="radio" name="vEcho" id="vEchoSolaire" value="Panneaux solaires">
+                    <span>Panneaux solaires</span>
+                  </div>
+                  <div>
+                    <input type="radio" name="vEcho" id="vEchoEolienne" value="Eolienne">
+                    <span>Eolienne</span>
+                  </div>
+                  <div>
+                    <input type="radio" name="vEcho" id="vEchoBatterie" value="Batterie">
+                    <span>Batterie</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rubrique">
+              <div class="rubrique-titre"><b>ALPHA</b><span>Autonomie</span></div>
+              <div class="rubrique-corps">
+                <div class="ligne-champ">
+                  <div class="form-group">
+                    <input type="number" min="0" step="1" name="vAlpha" id="vAlpha" placeholder="XX"
+                      class="champ-court" title="Autonomie en heures" />
+                  </div>
+                  <span class="unite">heures</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="rubrique">
+              <div class="rubrique-titre"><b>DELTA</b><span>Disponibilite</span></div>
+              <div class="rubrique-corps">
+                <div class="ligne-champ">
+                  <div class="form-group">
+                    <input type="number" min="0" step="1" name="vDelta" id="vDelta" placeholder="XX"
+                      class="champ-court" title="Delai avant d'etre operationnel" />
+                  </div>
+                  <div class="form-group">
+                    <select name="vDeltaUnite" id="vDeltaUnite" class="champ-court"
+                      title="Unite du delai de disponibilite">
+                      <option value="Heures">heures</option>
+                      <option value="Minutes">minutes</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-container">
+              <div class="form-group">
+                <label for="vCommentaire">Commentaire (facultatif)</label>
+                <textarea placeholder="Precision utile : relais utilise, acces au site, equipe presente..."
+                  name="vCommentaire" id="vCommentaire" title="Commentaire libre" rows="3"
+                  onkeyup="AutoGrowTextArea(this)"></textarea>
+              </div>
+            </div>
+          </div>
+
           <div class="form-group button">
             <button type="submit">Envoyer</button>
           </div>
@@ -716,6 +966,19 @@
           l'auteur : il indique l'autorite d'origine et l'autorite destinataire, puis
           recopie le texte sans le modifier.</p>
 
+        <h3>Procedure codifiee</h3>
+        <p>Compte rendu normalise de l'etat de la station, transmis a l'ouverture du
+          reseau ou sur demande du gestionnaire.</p>
+        <ul>
+          <li><b>PAPA</b> : position, commune et coordonnees. Le format transmis
+            accompagne les coordonnees.</li>
+          <li><b>SIERRA</b> : station fixe, mobile ou portable.</li>
+          <li><b>GOLF</b> : gammes exploitables, plusieurs choix possibles.</li>
+          <li><b>ECHO</b> : source d'alimentation electrique.</li>
+          <li><b>ALPHA</b> : autonomie restante, en heures.</li>
+          <li><b>DELTA</b> : delai avant d'etre operationnel.</li>
+        </ul>
+
         <h3>Les quatre rubriques</h3>
         <ul>
           <li><b>Je suis</b> : ou je me trouve, avec quels moyens.</li>
@@ -732,7 +995,7 @@
         <h3>Champs</h3>
         <ul>
           <li><b>N&deg; du message</b> : pre-rempli par Winlink, modifiable.</li>
-          <li><b>Date / Heure</b> : bouton UTC / LOC pour basculer de fuseau.</li>
+          <li><b>Date / Heure</b> : heure locale, renseignee automatiquement et modifiable.</li>
           <li><b>Origine</b> : indicatif de la station emettrice (fond jaune).</li>
           <li><b>Destinataire(s)</b> : indicatifs separes par des points-virgules.</li>
           <li><b>Autorites</b> (fond vert) : uniquement pour un message encapsule.</li>

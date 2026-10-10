@@ -225,7 +225,8 @@
 
     function init() {
       accents(["vOrigine", "vTo", "vAutOrig", "vAutDest", "vSujet", "vMessage",
-               "vJeSuis", "vJeVois", "vJeFais", "vJeDemande"]);
+               "vJeSuis", "vJeVois", "vJeFais", "vJeDemande",
+               "vPapaCommune", "vPapaGPS", "vCommentaire"]);
 
       // Accuse de reception
       var ar = document.getElementById("Dem_Rep");
@@ -238,14 +239,23 @@
       // Affichage conditionnel selon le type de message
       var type = document.getElementById("vTypeRaw").innerHTML.trim();
       var encapsule = (type === "ENCAPSULE");
+      var codifiee = (type === "CODIFIEE");
+      var soie = (!encapsule && !codifiee);
 
       document.getElementById("blocAutorites").style.display = encapsule ? "" : "none";
       document.getElementById("blocEncapsule").style.display = encapsule ? "" : "none";
-      document.getElementById("blocSOIE").style.display = encapsule ? "none" : "";
+      document.getElementById("blocSOIE").style.display = soie ? "" : "none";
+      document.getElementById("blocCodifiee").style.display = codifiee ? "" : "none";
+
+      // Le commentaire est facultatif : masque s'il est vide
+      if (codifiee && document.getElementById("vCommentaire").innerHTML.trim() === "") {
+        document.getElementById("ligneCommentaire").style.display = "none";
+      }
 
       var libelle = "MESSAGE ENCAPSULE";
       if (type === "AMBIANCE") libelle = "MESSAGE D'AMBIANCE";
       if (type === "SITUATION") libelle = "MESSAGE DE SITUATION";
+      if (type === "CODIFIEE") libelle = "PROCEDURE CODIFIEE";
       document.getElementById("vTypeBanner").innerHTML = libelle;
     }
   </script>
@@ -419,6 +429,65 @@
             <div class="form-group">
               <label>Je demande</label>
               <pre id="vJeDemande" class="code-block">{var vJeDemande}</pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ Bloc PROCEDURE CODIFIEE ============ -->
+        <div id="blocCodifiee">
+          <hr>
+          <div class="grid-container3">
+            <div class="form-group">
+              <label>PAPA &ndash; Commune</label>
+              <span id="vPapaCommune" class="code-block">{var vPapaCommune}</span>
+            </div>
+
+            <div class="form-group">
+              <label>PAPA &ndash; Coordonnees</label>
+              <span id="vPapaGPS" class="code-block">{var vPapaGPS}</span>
+            </div>
+
+            <div class="form-group">
+              <label>PAPA &ndash; Format</label>
+              <span id="vPapaFormat" class="code-block">{var vPapaFormat}</span>
+            </div>
+          </div>
+
+          <div class="grid-container3">
+            <div class="form-group">
+              <label>SIERRA &ndash; Station</label>
+              <span id="vSierra" class="code-block">{var vSierra}</span>
+            </div>
+
+            <div class="form-group">
+              <label>GOLF &ndash; Gammes</label>
+              <span id="vGolf" class="code-block">{var vGolf}</span>
+            </div>
+
+            <div class="form-group">
+              <label>ECHO &ndash; Source electrique</label>
+              <span id="vEcho" class="code-block">{var vEcho}</span>
+            </div>
+          </div>
+
+          <div class="grid-container3">
+            <div class="form-group">
+              <label>ALPHA &ndash; Autonomie</label>
+              <span id="vAlpha" class="code-block">{var vAlpha} Heures</span>
+            </div>
+
+            <div class="form-group">
+              <label>DELTA &ndash; Disponibilite</label>
+              <span id="vDelta" class="code-block">{var vDelta} {var vDeltaUnite}</span>
+            </div>
+
+            <div class="form-group"></div>
+          </div>
+
+          <div class="grid-container" id="ligneCommentaire">
+            <div class="form-group">
+              <label>Commentaire</label>
+              <pre id="vCommentaire" class="code-block">{var vCommentaire}</pre>
             </div>
           </div>
         </div>
