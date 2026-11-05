@@ -97,7 +97,7 @@ Pour retoucher les couleurs, modifier les dégradés `adrOrange` / `adrBleu` (lo
 
 ## Installateur Windows
 
-Le dossier contient un script **Inno Setup 6** qui produit un `.exe` d'installation, pratique pour déployer les modèles sur les postes de l'association sans manipulation de dossiers.
+Le projet contient un script **Inno Setup 6** qui produit un `.exe` d'installation, pratique pour déployer les modèles sur les postes de l'association sans manipulation de dossiers.
 
 Compilation, depuis le dossier qui contient `ADRASEC06_Templates.iss` :
 
@@ -105,18 +105,56 @@ Compilation, depuis le dossier qui contient `ADRASEC06_Templates.iss` :
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ADRASEC06_Templates.iss
 ```
 
-Le résultat, `ADRASEC06_Templates_Setup_1.0.0.exe`, est autonome et distribuable tel quel.
+Le résultat, `Modeles_Winlink_Setup_1.1.1.exe`, est autonome et distribuable tel quel.
 
-Ce que fait l'installateur :
+### Jeux de modèles proposés
+
+L'assistant demande ce qu'il faut installer :
+
+| Choix | Contenu | Dossier installé |
+|---|---|---|
+| Les deux (par défaut) | ADRASEC 06 + FNRASEC | les deux ci-dessous |
+| ADRASEC 06 uniquement | message (ambiance / situation / encapsulé / procédure codifiée) et accusé de réception | `Templates\ADRASEC06` |
+| FNRASEC uniquement | les six formulaires officiels FNRASEC 25.10.1 | `Templates\FNRASEC` |
+| Personnalisée | cases à cocher libres | — |
+
+Les deux jeux sont indépendants : ils vivent dans des sous-dossiers distincts et apparaissent comme deux groupes séparés dans la liste des modèles de Winlink.
+
+### Ce que fait l'installateur
 
 - il cherche Winlink Express dans les emplacements habituels et pré-remplit le dossier ; si `RMS Express.exe` est absent du dossier choisi, il prévient sans bloquer ;
-- il écrit les modèles dans `<Winlink>\Global Folders\Templates\ADRASEC06` ;
-- une case à cocher facultative dépose en plus une copie sur le Bureau, dans `ADRASEC06_WoAD`, avec un rappel de la marche à suivre pour le téléphone ;
-- il s'inscrit dans Ajout/Suppression de programmes et sait se désinstaller, en supprimant uniquement son propre sous-dossier de modèles.
+- il écrit les modèles dans `<Winlink>\Global Folders\Templates\<jeu>` ;
+- si un dossier de modèles existe déjà, il demande confirmation avant de le remplacer ;
+- une case à cocher facultative dépose en plus une copie sur le Bureau, dans `Winlink_WoAD`, avec un rappel de la marche à suivre pour le téléphone ; cette copie est **à plat**, tous jeux confondus, parce que WoAD ne descend pas de façon fiable dans les sous-dossiers ;
+- il s'inscrit dans Ajout/Suppression de programmes et sait se désinstaller, en ne supprimant que les dossiers des jeux réellement installés.
 
-Fichiers du projet d'installation : `ADRASEC06_Templates.iss`, `setup_icon.ico`, `setup_wizard.bmp`, `setup_wizard_small.bmp`. Ils doivent rester à côté du dossier `ADRASEC06`, qui fournit les fichiers à installer.
+### Numéro de version
 
-Pour changer de version, modifier `#define AppVersion` en tête du script ; le nom du `.exe` produit suit automatiquement.
+Les modèles ADRASEC 06 et l'installateur portent **le même numéro**, aujourd'hui `1.1.1`. C'est celui que chaque message transmet sous `Template Version`, celui qu'affiche le pied de page des formulaires, et celui du `.exe` produit.
+
+Ce numéro figure à sept endroits, et les éditer à la main les fait dériver. Le script `set-version.ps1` les met tous à jour d'un coup :
+
+```
+.\set-version.ps1 1.1.2
+```
+
+Il ne touche qu'aux fichiers ADRASEC 06 et au `.iss`, préserve l'encodage de chacun — le `.iss` a besoin de son BOM pour les accents, les HTML n'en ont pas — et laisse le dossier `FNRASEC` intact, puisque sa version `25.10.1` appartient à ses auteurs. Recompiler l'installateur après coup.
+
+### Fichiers du projet d'installation
+
+`ADRASEC06_Templates.iss`, `set-version.ps1`, `setup_icon.ico`, `setup_wizard.bmp`, `setup_wizard_small.bmp`, plus les dossiers `ADRASEC06` et `FNRASEC` qui fournissent les fichiers à installer.
+
+Pour changer de version, utiliser `set-version.ps1` plutôt que d'éditer `#define AppVersion` seul, afin que les modèles et l'installateur restent en phase ; le nom du `.exe` produit suit automatiquement.
+
+### Modèles FNRASEC
+
+Ce sont les modèles officiels de la FNRASEC en version **25.10.1**, œuvre de Jean-Louis Zola (F4IXH), redistribués sous licence MIT. La notice de copyright les accompagne dans le dossier `FNRASEC`, sous le nom `LICENSE_FNRASEC.md`.
+
+L'extension `.md` n'est pas un détail : Winlink liste **tout** fichier `.txt` d'un dossier de modèles comme un modèle, donc une licence nommée `.txt` apparaîtrait comme une entrée fantôme dans la liste.
+
+Les six fichiers `.txt` portent leur nom canonique, `FNRASEC <titre> 25.10.1.txt`, qui est aussi celui que la ligne `ReplyTemplate:` des cinq autres formulaires référence. Les renommer casserait la réponse automatique par accusé de réception.
+
+Pour passer à une version ultérieure des modèles FNRASEC : remplacer le contenu du dossier `FNRASEC`, en conservant la correspondance entre les noms de fichiers et les lignes `Form:` et `ReplyTemplate:` qu'ils contiennent.
 
 ## Winlink Express et WoAD
 
@@ -129,6 +167,50 @@ Les mêmes fichiers servent aux deux applications, sans adaptation. Ce qui chang
 Un dossier partagé sélectionné via le sélecteur de fichiers Android ne convient pas : WoAD y liste bien les `.txt`, mais n'ouvre pas les `.html` voisins. Il retombe alors silencieusement en mode texte et affiche le modèle brut, avec les `<var ...>` non résolus — symptôme trompeur qui ressemble à un défaut du modèle alors que les fichiers sont corrects.
 
 Le dossier `Android/data/...` est masqué par les explorateurs de fichiers Android ; le plus simple est de brancher le téléphone en USB et d'y copier les fichiers depuis un ordinateur. Redémarrer WoAD complètement après la copie.
+
+### Format des fichiers `.txt` : pas de BOM
+
+**Les fichiers de définition `.txt` doivent être enregistrés en UTF-8 _sans_ BOM**, avec des fins de ligne CRLF. Les accents dans le corps ne posent aucun problème.
+
+`Form:` est la première ligne du fichier. Un BOM UTF-8 la préfixe de trois octets invisibles, WoAD ne reconnaît plus le mot-clé, ignore donc le formulaire HTML et ouvre le modèle en texte brut avec tous les `<var ...>` non résolus. Winlink Express, lui, tolère ce BOM — d'où un modèle qui fonctionne d'un côté et pas de l'autre.
+
+Les modèles FNRASEC sont enregistrés sans BOM et avec accents : c'est la référence à suivre, et la comparaison des deux jeux côte à côte dans le même dossier est le moyen le plus rapide de vérifier ce point en cas de doute.
+
+Attention aux éditeurs Windows : le Bloc-notes ajoute un BOM quand on choisit « UTF-8 » dans l'ancienne boîte d'enregistrement. Sous Notepad++, choisir « UTF-8 » et non « UTF-8-BOM ».
+
+### Installer les modèles sur le téléphone
+
+**Les fichiers doivent être à plat dans `Android/data/com.sumusltd.woad/files/`, sans aucun sous-dossier.**
+
+WoAD retrouve les `.txt` même rangés dans un sous-dossier, et les affiche donc dans la liste des modèles, mais il cherche les `.html` à la racine du dossier configuré. Déballer l'archive du projet telle quelle crée `files/ADRASEC06/` et `files/FNRASEC/`, et à partir de là chaque modèle s'ouvre en texte brut — avec le même symptôme que le BOM ci-dessus, pour une cause différente.
+
+L'archive `WoAD_Templates.zip` contient les mêmes fichiers déjà à plat, prêts à être déposés dans `files/`. L'installateur Windows produit la même chose dans son dossier `Winlink_WoAD` sur le Bureau.
+
+Après copie, redémarrer WoAD complètement. S'il reste d'anciens sous-dossiers dans `files/`, les supprimer : leurs `.txt` continueraient d'apparaître en double dans la liste.
+
+Winlink Express, lui, gère très bien les sous-dossiers et s'en sert pour grouper les modèles par jeu — d'où la différence de traitement entre les deux.
+
+### Lire un message reçu dans WoAD
+
+WoAD affiche d'abord le corps du message en texte brut. Le formulaire mis en page s'ouvre en **touchant le lien de la pièce jointe XML** affiché sous l'en-tête, par exemple `RMS_Express_Form_ADRASEC06_Message_Viewer.xml`.
+
+WoAD cherche alors le fichier HTML dont ce nom dérive — ici `ADRASEC06_Message_Viewer.html` — dans son dossier de modèles. Le `_Viewer.html` doit donc être présent sur le téléphone, et pas seulement le `_Initial.html` qui sert à la rédaction.
+
+Si rien ne s'ouvre au toucher, c'est que WoAD ne trouve pas ce fichier : vérifier qu'il est bien dans `Android/data/com.sumusltd.woad/files/`, au même niveau que les autres.
+
+### Répondre par un accusé de réception sous WoAD
+
+WoAD ouvre bien le formulaire d'accusé quand on touche Répondre, et le XML joint porte les valeurs saisies. En revanche, **le corps texte du message est composé avec les données du message auquel on répond** dès qu'une variable porte le même nom dans les deux modèles.
+
+C'est pourquoi toutes les variables de l'accusé portent un préfixe `ar` : `arNumero`, `arPriority`, `arDate`, `arHeure`, `arSender`, `arOrigine`, `arTo`, `arRef`, `arCommentaire`, `arVersion`. Aucune ne peut entrer en collision avec celles du modèle Message, donc chacune garde la valeur saisie.
+
+Sans cette précaution, l'accusé reprenait la priorité, la date, l'heure et le numéro du message d'origine, et surtout son `vTo` — ce qui l'envoyait au destinataire du message d'origine au lieu de son expéditeur.
+
+**Toute variable ajoutée plus tard au modèle d'accusé doit garder ce préfixe**, sous peine de réintroduire le défaut silencieusement.
+
+### Numéro de l'accusé
+
+Le numéro est celui du compteur de séquence de la station (`{SeqNum}`), pas l'identifiant interne du message accusé (`{MsgOriginalID}`), qui est une chaîne du type `1SNY4XKF0RMR` inexploitable à l'oral comme sur un journal papier. Le lien avec le message accusé est porté par le champ **Référence du message accusé**, qui en reprend le sujet complet avec son propre numéro.
 
 À savoir également : la WebView de WoAD **bloque `localStorage`**, ce qui casse certains modèles standards Winlink. Aucun de ces formulaires ne s'en sert.
 
