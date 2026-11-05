@@ -1,13 +1,13 @@
 <#
     set-version.ps1
 
-    Aligns the version number of the ADRASEC 06 templates and of the Inno Setup
+    Aligns the version number of the ADRASEC templates and of the Inno Setup
     installer, which otherwise live in seven hard-coded places and drift apart.
 
     Usage, from the folder holding this script:
         .\set-version.ps1 1.1.2
 
-    Touches only the ADRASEC 06 files and the .iss. The FNRASEC folder keeps its
+    Touches only the ADRASEC files and the .iss. The FNRASEC folder keeps its
     own version (25.10.1), which belongs to its authors.
 #>
 
@@ -21,10 +21,10 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 $fichiers = @(
-    'ADRASEC06\ADRASEC06_Message_Initial.html',
-    'ADRASEC06\ADRASEC06_Message_Viewer.html',
-    'ADRASEC06\ADRASEC06_AR_Initial.html',
-    'ADRASEC06\ADRASEC06_AR_Viewer.html',
+    'ADRASEC\ADRASEC_Message_Initial.html',
+    'ADRASEC\ADRASEC_Message_Viewer.html',
+    'ADRASEC\ADRASEC_AR_Initial.html',
+    'ADRASEC\ADRASEC_AR_Viewer.html',
     'ADRASEC06_Templates.iss'
 )
 
@@ -32,7 +32,7 @@ $fichiers = @(
 $motifs = @(
     '(<meta name="version" content=")[0-9][0-9.]*',
     '(id="(?:TemplateVersion|arVersion)" value=")[0-9][0-9.]*',
-    '(ADRASEC 06 - (?:Message|AR) v)[0-9][0-9.]*',
+    '(ADRASEC - (?:Message|AR) v)[0-9][0-9.]*',
     '(#define AppVersion\s+")[0-9][0-9.]*'
 )
 
