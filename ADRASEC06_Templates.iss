@@ -19,6 +19,11 @@
 ;     setup_wizard_small.bmp
 ;     ADRASEC06\            <- ADRASEC 06 template files
 ;     FNRASEC\              <- FNRASEC template files (MIT, see LICENSE_FNRASEC.md)
+;     set-version.ps1       <- keeps AppVersion and the template versions in step
+;
+; AppVersion below must match the version carried by the ADRASEC 06 templates,
+; which each message reports as "Template Version". Rather than editing the
+; seven places by hand, run:  .\set-version.ps1 <version>
 ;
 ; The FNRASEC templates are the work of Jean-Louis Zola (F4IXH), redistributed
 ; here under the MIT licence; their copyright notice ships in the FNRASEC
@@ -28,7 +33,7 @@
 ; ---------------------------------------------------------------------------
 
 #define AppName        "Modèles Winlink ADRASEC 06 et FNRASEC"
-#define AppVersion     "1.1.0"
+#define AppVersion     "1.1.3"
 #define AppPublisher   "ADRASEC 06"
 #define FolderA06      "ADRASEC06"
 #define FolderFNR      "FNRASEC"

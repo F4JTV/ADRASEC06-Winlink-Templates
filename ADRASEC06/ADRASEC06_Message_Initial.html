@@ -14,7 +14,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Modele Winlink ADRASEC 06">
-  <meta name="version" content="1.0.0">
+  <meta name="version" content="1.1.3">
   <title>Message ADRASEC 06</title>
 
   <style>
@@ -541,8 +541,12 @@
 
       document.getElementById("vSujet").value = removeUppercaseAccent(sujet);
 
+      // Reporte l'etat de la case dans le champ transmis
+      var demandeAR = document.getElementById("Dem_Rep").checked;
+      document.getElementById("Dem_RepVal").value = demandeAR ? "Oui" : "Non";
+
       var avis = 'Cliquez sur OK et fermez la fenetre de navigateur vide.';
-      if (document.getElementById("Dem_Rep").checked) {
+      if (demandeAR) {
         avis = 'ACCUSE DE RECEPTION DEMANDE\n\n'
              + 'Pensez a cocher "Request message receipt" dans la fenetre\n'
              + 'de redaction Winlink avant d\'envoyer le message.\n\n'
@@ -607,7 +611,7 @@
         <form onsubmit="return onSubmit();" method="post" id="ADRASEC06Form" enctype="multipart/form-data"
           action="http://{FormServer}:{FormPort}">
 
-          <input name="TemplateVersion" type="hidden" id="TemplateVersion" value="1.0.0" />
+          <input name="TemplateVersion" type="hidden" id="TemplateVersion" value="1.1.3" />
           <input name="msgSender" type="hidden" id="msgSender" value="{Callsign}" />
           <input name="vTypeLib" type="hidden" id="vTypeLib" value="" />
           <input name="vGolf" type="hidden" id="vGolf" value="" />
@@ -667,8 +671,11 @@
 
             <div class="form-group">
               <div style="display: flex; align-items: center; height: 100%; padding-top: 10px;">
-                <input type="checkbox" name="Dem_Rep" id="Dem_Rep" value="Oui"
-                  onclick="this.value = this.checked ? 'Oui' : 'Non';"
+                <!-- La valeur transmise vit dans le champ cache : une case non cochee
+                     n'est pas envoyee avec le formulaire, ce qui laissait <var Dem_Rep>
+                     non resolu dans le message. La case ne sert plus qu'a l'affichage. -->
+                <input type="hidden" name="Dem_Rep" id="Dem_RepVal" value="Non">
+                <input type="checkbox" id="Dem_Rep"
                   style="width: 20px; height: 20px; margin-right: 8px; margin-top: 0;">
                 <label for="Dem_Rep" style="margin: 0;">Demander un accuse de reception</label>
               </div>
@@ -936,7 +943,7 @@
     </div>
 
     <div class="footer no-print">
-      <span id="version" class="footer-text">ADRASEC 06 - Message v1.0.0</span>
+      <span id="version" class="footer-text">ADRASEC 06 - Message v1.1.3</span>
       <span id="brand" class="adrasec-text">ADRASEC 06</span>
       <span id="projectLink" class="footer-text">Winlink Template</span>
     </div>

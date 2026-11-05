@@ -13,7 +13,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="version" content="1.0.0">
+  <meta name="version" content="1.1.3">
   <title>Accuse de reception ADRASEC 06</title>
 
   <style>
@@ -205,13 +205,13 @@
     }
 
     function init() {
-      var ids = ["vOrigine", "vTo", "vRef", "vCommentaire"];
+      var ids = ["arOrigine", "arTo", "arRef", "arCommentaire"];
       for (var i = 0; i < ids.length; i++) {
         var el = document.getElementById(ids[i]);
         if (el) el.innerHTML = setacc(el.innerHTML);
       }
 
-      var prio = document.getElementById("Priority");
+      var prio = document.getElementById("arPriority");
       prio.className = "code-block prio-" + prio.innerHTML.trim();
     }
   </script>
@@ -275,29 +275,29 @@
         <div class="grid-container3">
           <div class="form-group">
             <label>N&deg; de l'AR</label>
-            <span id="vNumero" class="code-block">AR/{var vNumero}</span>
+            <span id="arNumero" class="code-block">AR/{var arNumero}</span>
           </div>
 
           <div class="form-group">
             <label>Priorite</label>
-            <span id="Priority" class="code-block">{var Priority}</span>
+            <span id="arPriority" class="code-block">{var arPriority}</span>
           </div>
 
           <div class="form-group">
             <label>Station emettrice</label>
-            <span id="msgSender" class="code-block">{var msgSender}</span>
+            <span id="arSender" class="code-block">{var arSender}</span>
           </div>
         </div>
 
         <div class="grid-container3">
           <div class="form-group">
             <label>Date</label>
-            <span id="vDate" class="code-block">{var vDate}</span>
+            <span id="arDate" class="code-block">{var arDate}</span>
           </div>
 
           <div class="form-group">
             <label>Heure</label>
-            <span id="vHeure" class="code-block">{var vHeure}</span>
+            <span id="arHeure" class="code-block">{var arHeure}</span>
           </div>
 
           <div class="form-group"></div>
@@ -308,19 +308,19 @@
         <div class="grid-container2">
           <div class="form-group">
             <label>Origine</label>
-            <span id="vOrigine" class="code-block">{var vOrigine}</span>
+            <span id="arOrigine" class="code-block">{var arOrigine}</span>
           </div>
 
           <div class="form-group">
             <label>Destinataire</label>
-            <span id="vTo" class="code-block">{var vTo}</span>
+            <span id="arTo" class="code-block">{var arTo}</span>
           </div>
         </div>
 
         <div class="grid-container">
           <div class="form-group">
             <label>Reference du message accuse</label>
-            <span id="vRef" class="code-block">{var vRef}</span>
+            <span id="arRef" class="code-block">{var arRef}</span>
           </div>
         </div>
 
@@ -329,7 +329,7 @@
         <div class="grid-container">
           <div class="form-group">
             <label>Commentaire</label>
-            <pre id="vCommentaire" class="code-block">{var vCommentaire}</pre>
+            <pre id="arCommentaire" class="code-block">{var arCommentaire}</pre>
           </div>
         </div>
 
@@ -341,7 +341,7 @@
     </div>
 
     <div class="footer no-print">
-      <span id="version" class="footer-text">ADRASEC 06 - AR v1.0.0</span>
+      <span id="version" class="footer-text">ADRASEC 06 - AR v1.1.3</span>
       <span id="brand" class="adrasec-text">ADRASEC 06</span>
       <span id="projectLink" class="footer-text">Winlink Template</span>
     </div>

@@ -1,4 +1,4 @@
-﻿Form: ADRASEC06_Message_Initial.html, ADRASEC06_Message_Viewer.html
+Form: ADRASEC06_Message_Initial.html, ADRASEC06_Message_Viewer.html
 ReplyTemplate: AR ADRASEC 06.txt
 SeqInc:
 To: <var vTo>

@@ -14,7 +14,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Modele Winlink ADRASEC 06">
-  <meta name="version" content="1.0.0">
+  <meta name="version" content="1.1.3">
   <title>Accuse de reception ADRASEC 06</title>
 
   <style>
@@ -318,13 +318,28 @@
     // Date et heure locales
     function SetDateHeureLocale() {
       var d = new Date();
-      document.getElementById("vDate").value =
+      document.getElementById("arDate").value =
         d.getFullYear() + '-' +
         ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
         ('0' + d.getDate()).slice(-2);
-      document.getElementById("vHeure").value =
+      document.getElementById("arHeure").value =
         ('0' + d.getHours()).slice(-2) + ':' +
         ('0' + d.getMinutes()).slice(-2) + ' (LOC)';
+    }
+
+    //==================================================================
+    // Balises d'insertion
+    //==================================================================
+    // L'application remplace {Balise} au chargement du formulaire. Celle
+    // qu'elle ne connait pas reste litterale : la transmettre telle quelle
+    // mettrait "{MsgOriginalSender}" dans le message, donc on la vide.
+    function valeurSubstituee(valeur) {
+      if (!valeur) return "";
+      var v = valeur.replace(/^\s+|\s+$/g, "");
+      if (v.charAt(0) === "{" && v.charAt(v.length - 1) === "}" && v.indexOf(" ") === -1) {
+        return "";
+      }
+      return valeur;
     }
 
     //==================================================================
@@ -341,14 +356,25 @@
 
       SetDateHeureLocale();
 
-      // Numero de l'AR : identifiant du message accuse, sinon numero de sequence
-      var numero = '{MsgOriginalID}';
-      if (!numero || numero.indexOf('{') === 0) numero = '{SeqNum}';
-      document.getElementById("vNumero").value = numero;
+      // Numero de l'AR : le compteur de sequence de la station, lisible et
+      // consignable sur un journal. L'identifiant interne du message accuse
+      // ({MsgOriginalID}) n'est pas utilise ici : c'est une chaine du type
+      // 1SNY4XKF0RMR, inexploitable a l'oral comme sur le papier. Le lien avec
+      // le message accuse est porte par le champ Reference, plus bas.
+      var champNumero = document.getElementById("arNumero");
+      champNumero.value = valeurSubstituee(champNumero.value);
+
+      // Champs herites du message accuse ou de la station : une balise que
+      // l'application ne sait pas remplir est videe plutot que transmise.
+      var champs = ["arSender", "arOrigine", "arTo"];
+      for (var i = 0; i < champs.length; i++) {
+        var el = document.getElementById(champs[i]);
+        el.value = valeurSubstituee(el.value);
+      }
 
       // La reference heritee du message recu peut contenir des accents mal encodes
-      var ref = document.getElementById("vRef");
-      ref.value = setacc(ref.value);
+      var ref = document.getElementById("arRef");
+      ref.value = setacc(valeurSubstituee(ref.value));
       AutoGrowTextArea(ref);
     }
 
@@ -356,7 +382,7 @@
     // Envoi
     //==================================================================
     function onSubmit() {
-      var champs = ["vOrigine", "vTo", "vRef", "vCommentaire"];
+      var champs = ["arOrigine", "arTo", "arRef", "arCommentaire"];
       for (var i = 0; i < champs.length; i++) {
         var el = document.getElementById(champs[i]);
         el.value = removeUppercaseAccent(el.value);
@@ -420,16 +446,16 @@
         <form onsubmit="return onSubmit();" method="post" id="ADRASEC06ARForm" enctype="multipart/form-data"
           action="http://{FormServer}:{FormPort}">
 
-          <input name="TemplateVersion" type="hidden" id="TemplateVersion" value="1.0.0" />
-          <input name="msgSender" type="hidden" id="msgSender" value="{Callsign}" />
+          <input name="arVersion" type="hidden" id="arVersion" value="1.1.3" />
+          <input name="arSender" type="hidden" id="arSender" value="{Callsign}" />
 
           <!-- N&deg; de l'AR / Priorite -->
           <div class="grid-container3">
             <div class="form-group">
-              <label for="vNumero">N&deg; de l'AR</label>
+              <label for="arNumero">N&deg; de l'AR</label>
               <div style="display: flex; gap: 4px; align-items: center;">
                 <span style="font-weight: bold; color: #004085;">AR /</span>
-                <input title="Reference du message accuse, modifiable" name="vNumero" id="vNumero" value="{SeqNum}"
+                <input title="Reference du message accuse, modifiable" name="arNumero" id="arNumero" value="{SeqNum}"
                   size="8" maxlength="20" style="color: red;" required>
               </div>
             </div>
@@ -438,15 +464,15 @@
               <label>Priorite</label>
               <div class="radio-group">
                 <div class="red">
-                  <input type="radio" name="Priority" value="IMMEDIAT">
+                  <input type="radio" name="arPriority" value="IMMEDIAT">
                   <span>Immediat</span>
                 </div>
                 <div class="orange">
-                  <input type="radio" name="Priority" value="URGENT">
+                  <input type="radio" name="arPriority" value="URGENT">
                   <span>Urgent</span>
                 </div>
                 <div class="green">
-                  <input type="radio" name="Priority" value="ROUTINE" checked>
+                  <input type="radio" name="arPriority" value="ROUTINE" checked>
                   <span>Routine</span>
                 </div>
               </div>
@@ -458,13 +484,13 @@
           <!-- Date / Heure locales -->
           <div class="grid-container2">
             <div class="form-group">
-              <label for="vDate">Date</label>
-              <input id="vDate" name="vDate" placeholder="AAAA-MM-JJ" title="Date de l'accuse de reception" required />
+              <label for="arDate">Date</label>
+              <input id="arDate" name="arDate" placeholder="AAAA-MM-JJ" title="Date de l'accuse de reception" required />
             </div>
 
             <div class="form-group">
-              <label for="vHeure">Heure locale</label>
-              <input id="vHeure" name="vHeure" placeholder="HH:MM" title="Heure locale" required />
+              <label for="arHeure">Heure locale</label>
+              <input id="arHeure" name="arHeure" placeholder="HH:MM" title="Heure locale" required />
             </div>
           </div>
 
@@ -474,14 +500,14 @@
           <!-- Origine / Destinataire -->
           <div class="grid-container2">
             <div class="form-group">
-              <label for="vOrigine">Origine</label>
-              <input name="vOrigine" id="vOrigine" title="Indicatif de la station qui accuse reception"
+              <label for="arOrigine">Origine</label>
+              <input name="arOrigine" id="arOrigine" title="Indicatif de la station qui accuse reception"
                 value="{Callsign}" size="20" maxlength="20" class="bg-yellow" required />
             </div>
 
             <div class="form-group">
-              <label for="vTo">Destinataire</label>
-              <input name="vTo" id="vTo" title="Indicatif de la station qui a emis le message accuse"
+              <label for="arTo">Destinataire</label>
+              <input name="arTo" id="arTo" title="Indicatif de la station qui a emis le message accuse"
                 value="{MsgOriginalSender}" size="100" maxlength="100" class="bg-yellow" required />
             </div>
           </div>
@@ -489,8 +515,8 @@
           <!-- Reference du message accuse -->
           <div class="grid-container">
             <div class="form-group">
-              <label for="vRef">Reference du message accuse</label>
-              <textarea name="vRef" id="vRef" title="Sujet du message recu, pre-rempli automatiquement" rows="1"
+              <label for="arRef">Reference du message accuse</label>
+              <textarea name="arRef" id="arRef" title="Sujet du message recu, pre-rempli automatiquement" rows="1"
                 required onkeyup="AutoGrowTextArea(this)">{MsgOriginalSubject}</textarea>
             </div>
           </div>
@@ -498,9 +524,9 @@
           <!-- Commentaire -->
           <div class="grid-container">
             <div class="form-group">
-              <label for="vCommentaire">Commentaire</label>
-              <textarea placeholder="Ex : Message bien recu et transmis au COD a 14h40. 73" name="vCommentaire"
-                id="vCommentaire" title="Commentaire libre" rows="7" required
+              <label for="arCommentaire">Commentaire</label>
+              <textarea placeholder="Ex : Message bien recu et transmis au COD a 14h40. 73" name="arCommentaire"
+                id="arCommentaire" title="Commentaire libre" rows="7" required
                 onkeyup="AutoGrowTextArea(this)"></textarea>
             </div>
           </div>
@@ -515,7 +541,7 @@
     </div>
 
     <div class="footer no-print">
-      <span id="version" class="footer-text">ADRASEC 06 - AR v1.0.0</span>
+      <span id="version" class="footer-text">ADRASEC 06 - AR v1.1.3</span>
       <span id="brand" class="adrasec-text">ADRASEC 06</span>
       <span id="projectLink" class="footer-text">Winlink Template</span>
     </div>

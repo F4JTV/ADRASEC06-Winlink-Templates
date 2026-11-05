@@ -1,32 +1,32 @@
-﻿Form: ADRASEC06_AR_Initial.html, ADRASEC06_AR_Viewer.html
+Form: ADRASEC06_AR_Initial.html, ADRASEC06_AR_Viewer.html
 SeqInc:
-To: <var vTo>
-Subject: [<var Priority>][AR/<var vNumero>] <var vRef>
+To: <var arTo>
+Subject: [<var arPriority>][AR/<var arNumero>] <var arRef>
 Msg:
 ------------------------------------------------------------------------
 -- ACCUSE DE RECEPTION
 ------------------------------------------------------------------------
 
-N° de l'AR: AR/<var vNumero>
-Priorité: <var Priority>
+N° de l'AR: AR/<var arNumero>
+Priorité: <var arPriority>
 
-Date: <var vDate>
-Heure: <var vHeure>
-Indicatif de la station: <var msgSender>
+Date: <var arDate>
+Heure: <var arHeure>
+Indicatif de la station: <var arSender>
 
 ------------------------------------------------------------------------
 
-Origine: <var vOrigine>
-Destinataire: <var vTo>
+Origine: <var arOrigine>
+Destinataire: <var arTo>
 
-Référence du message accusé: <var vRef>
+Référence du message accusé: <var arRef>
 
 ------------------------------------------------------------------------
 
 Commentaire:
-<var vCommentaire>
+<var arCommentaire>
 
 ------------------------------------------------------------------------
 Express Sending Station: <MsgSender>
 Express Version: <ProgramVersion>
-Template Version: <var TemplateVersion>
+Template Version: <var arVersion>
