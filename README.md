@@ -1,4 +1,4 @@
-# Modèle Winlink ADRASEC 06 — Message d'ambiance / situation / encapsulé
+# Modèles Winlink ADRASEC
 
 Formulaire unique avec bascule automatique selon le **type de message** choisi.
 
@@ -6,12 +6,12 @@ Formulaire unique avec bascule automatique selon le **type de message** choisi.
 
 | Fichier | Rôle |
 |---|---|
-| `Message ADRASEC 06.txt` | Définition du modèle (c'est ce nom qui apparaît dans la liste). ASCII pur, sans BOM, fins de ligne CRLF. |
-| `ADRASEC06_Message_Initial.html` | Formulaire de saisie |
-| `ADRASEC06_Message_Viewer.html` | Affichage / impression du message reçu |
-| `AR ADRASEC 06.txt` | Définition du modèle d'accusé de réception |
-| `ADRASEC06_AR_Initial.html` | Formulaire d'accusé de réception |
-| `ADRASEC06_AR_Viewer.html` | Affichage / impression de l'accusé reçu |
+| `Message ADRASEC.txt` | Définition du modèle (c'est ce nom qui apparaît dans la liste). ASCII pur, sans BOM, fins de ligne CRLF. |
+| `ADRASEC_Message_Initial.html` | Formulaire de saisie |
+| `ADRASEC_Message_Viewer.html` | Affichage / impression du message reçu |
+| `AR ADRASEC.txt` | Définition du modèle d'accusé de réception |
+| `ADRASEC_AR_Initial.html` | Formulaire d'accusé de réception |
+| `ADRASEC_AR_Viewer.html` | Affichage / impression de l'accusé reçu |
 
 Les trois fichiers sont autonomes : CSS et JavaScript sont intégrés, aucune dépendance externe.
 
@@ -20,10 +20,10 @@ Les trois fichiers sont autonomes : CSS et JavaScript sont intégrés, aucune d�
 Copier les trois fichiers dans un sous-dossier de :
 
 ```
-C:\RMS Express\Global Folders\Templates\ADRASEC06\
+C:\RMS Express\Global Folders\Templates\ADRASEC\
 ```
 
-Puis dans Winlink Express : *Message > New Message > Select Template* → dossier `ADRASEC06` → `Message ADRASEC 06`.
+Puis dans Winlink Express : *Message > New Message > Select Template* → dossier `ADRASEC` → `Message ADRASEC`.
 
 ## Comportement du formulaire
 
@@ -71,9 +71,9 @@ Le sujet du message Winlink prend la forme : `[ROUTINE][AMBIANCE/017] MESSAGE D'
 
 ## Personnalisation
 
-**Logos** — le logo ADRASEC 06 (à gauche) et l'emblème de la protection civile (à droite) sont intégrés directement en **SVG vectoriel** dans les deux fichiers HTML : pas d'image externe, pas de base64, et un rendu net à l'écran comme à l'impression.
+**Logos** — le logo ADRASEC (à gauche) et l'emblème de la protection civile (à droite) sont intégrés directement en **SVG vectoriel** dans les deux fichiers HTML : pas d'image externe, pas de base64, et un rendu net à l'écran comme à l'impression.
 
-Le fichier `logo_adrasec06.svg` est fourni à part pour d'autres usages (site, courrier, QSL) ; `logo_adrasec06.png` en est un export 512 px.
+Le fichier `logo_adrasec.svg` est fourni à part pour d'autres usages (site, courrier, QSL) ; `logo_adrasec.png` en est un export 512 px.
 
 Pour ajuster la taille dans le bandeau, modifier la règle :
 
@@ -91,21 +91,39 @@ Pour retoucher les couleurs, modifier les dégradés `adrOrange` / `adrBleu` (lo
 
 ## Points de vérification avant mise en service
 
-1. Ouvrir `ADRASEC06_Message_Initial.html` dans un navigateur : basculer entre les quatre types et vérifier l'affichage.
+1. Ouvrir `ADRASEC_Message_Initial.html` dans un navigateur : basculer entre les quatre types et vérifier l'affichage.
 2. Faire un envoi réel vers soi-même (`vTo` = son propre indicatif) et contrôler le rendu du texte et du Viewer.
 3. Vérifier le comportement de l'auto-incrémentation `SeqInc:` sur deux messages consécutifs.
+
+## Adapter les modèles à une ADRASEC
+
+Ces modèles ne portent le nom d'aucun département : ils sont utilisables tels quels par n'importe quelle ADRASEC.
+
+Pour y faire figurer un département, une seule chose est à changer, le titre affiché en haut des deux formulaires :
+
+```html
+<h1>Message ADRASEC
+```
+
+devient par exemple `<h1>Message ADRASEC 83`, dans `ADRASEC_Message_Initial.html` et `ADRASEC_Message_Viewer.html` (et de même pour les deux fichiers de l'accusé si souhaité).
+
+**Ne pas renommer les fichiers ni les modèles.** Les lignes `Form:` et `ReplyTemplate:` des `.txt` désignent les `.html` par leur nom : les renommer sans reporter le changement partout casse l'ouverture du formulaire. De même, les variables préfixées `ar` de l'accusé ne doivent pas être renommées.
+
+L'identification de la station émettrice est déjà portée par le champ **Origine** (son indicatif), et celle de l'autorité par les champs **Autorité d'origine** et **Autorité destinataire** du message encapsulé. Le département n'a donc pas besoin de figurer dans le nom des modèles pour que le destinataire sache d'où vient le message.
+
+Le logo intégré est l'emblème générique A.D.R.A.S.E.C / Sécurité Civile, sans numéro. Il est fourni à part en `logo_adrasec.svg` pour qui voudrait en produire une variante départementale : c'est le texte du `textPath` supérieur qui porte la mention.
 
 ## Installateur Windows
 
 Le projet contient un script **Inno Setup 6** qui produit un `.exe` d'installation, pratique pour déployer les modèles sur les postes de l'association sans manipulation de dossiers.
 
-Compilation, depuis le dossier qui contient `ADRASEC06_Templates.iss` :
+Compilation, depuis le dossier qui contient `ADRASEC_Templates.iss` :
 
 ```
-"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ADRASEC06_Templates.iss
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" ADRASEC_Templates.iss
 ```
 
-Le résultat, `Modeles_Winlink_Setup_1.1.1.exe`, est autonome et distribuable tel quel.
+Le résultat, `Modeles_Winlink_Setup_1.1.3.exe`, est autonome et distribuable tel quel.
 
 ### Jeux de modèles proposés
 
@@ -113,8 +131,8 @@ L'assistant demande ce qu'il faut installer :
 
 | Choix | Contenu | Dossier installé |
 |---|---|---|
-| Les deux (par défaut) | ADRASEC 06 + FNRASEC | les deux ci-dessous |
-| ADRASEC 06 uniquement | message (ambiance / situation / encapsulé / procédure codifiée) et accusé de réception | `Templates\ADRASEC06` |
+| Les deux (par défaut) | ADRASEC + FNRASEC | les deux ci-dessous |
+| ADRASEC uniquement | message (ambiance / situation / encapsulé / procédure codifiée) et accusé de réception | `Templates\ADRASEC` |
 | FNRASEC uniquement | les six formulaires officiels FNRASEC 25.10.1 | `Templates\FNRASEC` |
 | Personnalisée | cases à cocher libres | — |
 
@@ -130,7 +148,7 @@ Les deux jeux sont indépendants : ils vivent dans des sous-dossiers distincts e
 
 ### Numéro de version
 
-Les modèles ADRASEC 06 et l'installateur portent **le même numéro**, aujourd'hui `1.1.1`. C'est celui que chaque message transmet sous `Template Version`, celui qu'affiche le pied de page des formulaires, et celui du `.exe` produit.
+Les modèles ADRASEC et l'installateur portent **le même numéro**, aujourd'hui `1.1.1`. C'est celui que chaque message transmet sous `Template Version`, celui qu'affiche le pied de page des formulaires, et celui du `.exe` produit.
 
 Ce numéro figure à sept endroits, et les éditer à la main les fait dériver. Le script `set-version.ps1` les met tous à jour d'un coup :
 
@@ -138,11 +156,11 @@ Ce numéro figure à sept endroits, et les éditer à la main les fait dériver.
 .\set-version.ps1 1.1.2
 ```
 
-Il ne touche qu'aux fichiers ADRASEC 06 et au `.iss`, préserve l'encodage de chacun — le `.iss` a besoin de son BOM pour les accents, les HTML n'en ont pas — et laisse le dossier `FNRASEC` intact, puisque sa version `25.10.1` appartient à ses auteurs. Recompiler l'installateur après coup.
+Il ne touche qu'aux fichiers ADRASEC et au `.iss`, préserve l'encodage de chacun — le `.iss` a besoin de son BOM pour les accents, les HTML n'en ont pas — et laisse le dossier `FNRASEC` intact, puisque sa version `25.10.1` appartient à ses auteurs. Recompiler l'installateur après coup.
 
 ### Fichiers du projet d'installation
 
-`ADRASEC06_Templates.iss`, `set-version.ps1`, `setup_icon.ico`, `setup_wizard.bmp`, `setup_wizard_small.bmp`, plus les dossiers `ADRASEC06` et `FNRASEC` qui fournissent les fichiers à installer.
+`ADRASEC_Templates.iss`, `set-version.ps1`, `setup_icon.ico`, `setup_wizard.bmp`, `setup_wizard_small.bmp`, plus les dossiers `ADRASEC` et `FNRASEC` qui fournissent les fichiers à installer.
 
 Pour changer de version, utiliser `set-version.ps1` plutôt que d'éditer `#define AppVersion` seul, afin que les modèles et l'installateur restent en phase ; le nom du `.exe` produit suit automatiquement.
 
@@ -182,7 +200,7 @@ Attention aux éditeurs Windows : le Bloc-notes ajoute un BOM quand on choisit �
 
 **Les fichiers doivent être à plat dans `Android/data/com.sumusltd.woad/files/`, sans aucun sous-dossier.**
 
-WoAD retrouve les `.txt` même rangés dans un sous-dossier, et les affiche donc dans la liste des modèles, mais il cherche les `.html` à la racine du dossier configuré. Déballer l'archive du projet telle quelle crée `files/ADRASEC06/` et `files/FNRASEC/`, et à partir de là chaque modèle s'ouvre en texte brut — avec le même symptôme que le BOM ci-dessus, pour une cause différente.
+WoAD retrouve les `.txt` même rangés dans un sous-dossier, et les affiche donc dans la liste des modèles, mais il cherche les `.html` à la racine du dossier configuré. Déballer l'archive du projet telle quelle crée `files/ADRASEC/` et `files/FNRASEC/`, et à partir de là chaque modèle s'ouvre en texte brut — avec le même symptôme que le BOM ci-dessus, pour une cause différente.
 
 L'archive `WoAD_Templates.zip` contient les mêmes fichiers déjà à plat, prêts à être déposés dans `files/`. L'installateur Windows produit la même chose dans son dossier `Winlink_WoAD` sur le Bureau.
 
@@ -192,9 +210,9 @@ Winlink Express, lui, gère très bien les sous-dossiers et s'en sert pour group
 
 ### Lire un message reçu dans WoAD
 
-WoAD affiche d'abord le corps du message en texte brut. Le formulaire mis en page s'ouvre en **touchant le lien de la pièce jointe XML** affiché sous l'en-tête, par exemple `RMS_Express_Form_ADRASEC06_Message_Viewer.xml`.
+WoAD affiche d'abord le corps du message en texte brut. Le formulaire mis en page s'ouvre en **touchant le lien de la pièce jointe XML** affiché sous l'en-tête, par exemple `RMS_Express_Form_ADRASEC_Message_Viewer.xml`.
 
-WoAD cherche alors le fichier HTML dont ce nom dérive — ici `ADRASEC06_Message_Viewer.html` — dans son dossier de modèles. Le `_Viewer.html` doit donc être présent sur le téléphone, et pas seulement le `_Initial.html` qui sert à la rédaction.
+WoAD cherche alors le fichier HTML dont ce nom dérive — ici `ADRASEC_Message_Viewer.html` — dans son dossier de modèles. Le `_Viewer.html` doit donc être présent sur le téléphone, et pas seulement le `_Initial.html` qui sert à la rédaction.
 
 Si rien ne s'ouvre au toucher, c'est que WoAD ne trouve pas ce fichier : vérifier qu'il est bien dans `Android/data/com.sumusltd.woad/files/`, au même niveau que les autres.
 
@@ -216,7 +234,7 @@ Le numéro est celui du compteur de séquence de la station (`{SeqNum}`), pas l'
 
 ## Accusé de réception
 
-Le modèle principal déclare `ReplyTemplate: AR ADRASEC 06.txt` : le destinataire qui clique sur **Reply** dans Winlink obtient directement le formulaire d'accusé, pré-rempli.
+Le modèle principal déclare `ReplyTemplate: AR ADRASEC.txt` : le destinataire qui clique sur **Reply** dans Winlink obtient directement le formulaire d'accusé, pré-rempli.
 
 | Champ | Origine |
 |---|---|
@@ -232,7 +250,7 @@ Cette ligne doit toujours pointer vers un **autre** fichier `.txt` existant. Une
 
 > Error writing form data to RMS_Express_Form_..._Viewer.html ReplyTemplate: ...xml : Caractères non conformes dans le chemin d'accès.
 
-Si cette erreur réapparaît, le nom de fichier est le suspect suivant : renommer `AR ADRASEC 06.txt` sans espaces et reporter le nouveau nom dans la ligne `ReplyTemplate:`.
+Si cette erreur réapparaît, le nom de fichier est le suspect suivant : renommer `AR ADRASEC.txt` sans espaces et reporter le nouveau nom dans la ligne `ReplyTemplate:`.
 
 
 Gabarit visuel repris des modèles FNRASEC de F4IXH (Jean-Louis Zola), sous licence MIT.
